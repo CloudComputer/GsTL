@@ -48,11 +48,11 @@ template <
          >
 class Gaussian_cdf_coKestimator{
   private:
-    typedef typename CovarianceSet C;
-    typedef typename KrigingConstraints K;
-    typedef typename Combiner Co;
-    typedef typename MatrixLibrary M;
-    typedef typename Gaussian_cdf_coKestimator<C,K,Co,M> Self;
+    typedef CovarianceSet C;
+    typedef KrigingConstraints K;
+    typedef Combiner Co;
+    typedef MatrixLibrary M;
+    typedef Gaussian_cdf_coKestimator<C,K,Co,M> Self;
 
   public:
   
@@ -80,7 +80,7 @@ class Gaussian_cdf_coKestimator{
       cov_set_ = rhs.cov_set_;
       Kconstr_ = rhs.Kconstr_; 
       combiner_ = rhs.combiner_;
-      weights_.reserve(50)
+      weights_.reserve(50);
     }
     return *this;
   }
