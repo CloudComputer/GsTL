@@ -282,7 +282,9 @@ Anisotropic_norm_3d(double max_radius, double mid_radius,
   R3(2,3) =  sin(theta);
   R3(3,2) = -sin(theta);
 
-  transformation_matrix_ = S*((R1*R2)*R3);
+  //transformation_matrix_ = S*((R1*R2)*R3);   //order seems wrong
+  // rotation order: R1 first, then R2 and R3
+  transformation_matrix_ = S*((R3*R2)*R1);
 
   WRITE_TO_DEBUG_STREAM( "S: " << S << "\n"
 	    << "R1: " << R1 <<  "\n"
