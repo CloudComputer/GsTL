@@ -79,7 +79,7 @@ class CI_Bayes_updating {
    * @param range [first, last) is a range of probability maps.
    * @param marginal is the marginal distribution P(A).
    */
-  template< class PropertyMapIterator, class NonParamCdf >
+  template< class PropertyMapIterator >
   CI_Bayes_updating( PropertyMapIterator first, PropertyMapIterator last,
                      const NonParamCdf& marginal) {
     std::copy( first, last, std::back_inserter( property_maps_ ) );
