@@ -255,7 +255,7 @@ template<
          class KrigingConstraints,
          class Vector
         >
-int kriging_weights(
+int kriging_weights_2(
 		    Vector& weights,
 		    double& kriging_variance,
 		    const Location& center,
@@ -314,7 +314,7 @@ template<
          class KrigingConstraints,
          class Vector
         >
-int kriging_weights(
+int kriging_weights_2(
 		    Vector& weights,
 		    const Location& center,
 		    const Neighborhood& neighbors,
@@ -362,7 +362,7 @@ template<
          class Vector
         >
 inline int
-kriging_weights(
+kriging_weights_2(
 		Vector& weights,
 		double& kriging_variance,
 		const Location& center,
@@ -371,7 +371,7 @@ kriging_weights(
 		KrigingConstraints& Kconstraints
 		) {
 
-  return kriging_weights< GSTL_TNT_lib >( weights, kriging_variance,
+  return kriging_weights_2< GSTL_TNT_lib >( weights, kriging_variance,
 					  center,neighbors,
 					  covar, covar_rhs, Kconstraints );
 }
@@ -389,7 +389,7 @@ template<
          class Vector
         >
 inline int
-kriging_weights(
+kriging_weights_2(
 		Vector& weights,
 		const Location& center,
 		const Neighborhood& neighbors,
@@ -397,7 +397,7 @@ kriging_weights(
 		KrigingConstraints& Kconstraints
 		) {
 
-  return kriging_weights< GSTL_TNT_lib >( weights,
+  return kriging_weights_2< GSTL_TNT_lib >( weights,
 					  center,neighbors,
 					  covar, covar_rhs, Kconstraints );
 }
