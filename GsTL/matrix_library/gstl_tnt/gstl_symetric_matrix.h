@@ -14,6 +14,7 @@ class Symmetric_matrix {
 
  public:
 
+  typedef T element_type;
   typedef T value_type;
   typedef T& reference;
   typedef const T& const_reference;
