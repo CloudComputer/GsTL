@@ -291,7 +291,7 @@ std::ostream& operator<<(std::ostream &s, const LowerTriangularView<MaTRiX>&A)
     Subscript M=A.num_rows();
     Subscript N=A.num_cols();
 
-    s << M << " " << N << endl;
+    s << M << " " << N << std::endl;
 
     for (Subscript i=1; i<=M; i++)
     {
@@ -299,7 +299,7 @@ std::ostream& operator<<(std::ostream &s, const LowerTriangularView<MaTRiX>&A)
         {
             s << A(i,j) << " ";
         }
-        s << endl;
+        s << std::endl;
     }
 
 
@@ -313,7 +313,7 @@ std::ostream& operator<<(std::ostream &s,
     Subscript M=A.num_rows();
     Subscript N=A.num_cols();
 
-    s << M << " " << N << endl;
+    s << M << " " << N << std::endl;
 
     for (Subscript i=1; i<=M; i++)
     {
@@ -321,7 +321,7 @@ std::ostream& operator<<(std::ostream &s,
         {
             s << A(i,j) << " ";
         }
-        s << endl;
+        s << std::endl;
     }
 
 
@@ -590,7 +590,7 @@ std::ostream& operator<<(std::ostream &s,
     Subscript M=A.num_rows();
     Subscript N=A.num_cols();
 
-    s << M << " " << N << endl;
+    s << M << " " << N << std::endl;
 
     for (Subscript i=1; i<=M; i++)
     {
@@ -598,7 +598,7 @@ std::ostream& operator<<(std::ostream &s,
         {
             s << A(i,j) << " ";
         }
-        s << endl;
+        s << std::endl;
     }
 
 
@@ -612,7 +612,7 @@ std::ostream& operator<<(std::ostream &s,
     Subscript M=A.num_rows();
     Subscript N=A.num_cols();
 
-    s << M << " " << N << endl;
+    s << M << " " << N << std::endl;
 
     for (Subscript i=1; i<=M; i++)
     {
@@ -620,7 +620,7 @@ std::ostream& operator<<(std::ostream &s,
         {
             s << A(i,j) << " ";
         }
-        s << endl;
+        s << std::endl;
     }
 
 
