@@ -2,6 +2,7 @@
 #define __GSTL_UTILS_DEBUG_TOOLS_H__
 
 #include <fstream> 
+#include <string> 
 
 namespace gstl_debug {
 
