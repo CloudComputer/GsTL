@@ -60,7 +60,7 @@ class Scan_image_cdf_estimator_t {
 			     int nb_of_categories);
 
 			  
-  template<class Geovalue_, class Neighborhood, class CategNonParamCdf>
+  template<class Geovalue_, class CategNonParamCdf>
   int operator()(const Geovalue_& u,
 		 const Neighborhood& neighbors,
 		 CategNonParamCdf& ccdf);
@@ -84,11 +84,10 @@ class Scan_image_cdf_estimator_t {
 
   void initialize_tree(int size);
 
-  template<class Neighborhood, class Location>
+  template<class Location>
   bool build_degenerated_tree(const Location& u,
 			      const Neighborhood& neighbors);
 
-  template<class Neighborhood>
   void update_tree(const Neighborhood& data_event,
 		   Property_type facies,
 		   const Neighborhood& neighbors);
@@ -100,11 +99,6 @@ class Scan_image_cdf_estimator_t {
 
 
 
-
-#if defined(__GNUC__) || defined(WIN32)
 #include "scan_image_cdf_estimator.cc"
-#elif defined(__xlC__)
-#pragma implementation("scan_image_cdf_estimator.cc")
-#endif
 
 #endif

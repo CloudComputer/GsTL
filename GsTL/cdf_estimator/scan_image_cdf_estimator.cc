@@ -39,9 +39,9 @@ Scan_image_cdf_estimator_t(Iterator begin, Iterator end,
 
 
 template<class I, class W>
-template<class Geovalue_, class Neighborhood, class NonParamCdf>
+template<class Geovalue_, class NonParamCdf>
 int Scan_image_cdf_estimator_t<I,W>::operator()(const Geovalue_& u,
-						const Neighborhood& neighbors,
+						const W& neighbors,
 						NonParamCdf& ccdf) {
 
   if(neighbors.is_empty())
@@ -74,7 +74,7 @@ initialize_tree(int size) {
 
 
 template<class Iterator, class Neighborhood>
-template<class Neighborhood, class Location>
+template<class Location>
 bool 
 Scan_image_cdf_estimator_t<Iterator,Neighborhood>::
 build_degenerated_tree(const Location& u,
@@ -116,7 +116,6 @@ build_degenerated_tree(const Location& u,
 
 
 template<class Iterator, class Neighborhood>
-template<class Neighborhood>
 void 
 Scan_image_cdf_estimator_t<Iterator,Neighborhood>::
 update_tree(const Neighborhood& data_event,

@@ -323,4 +323,128 @@ operator()(const argument_type& vec) const {
 }
 
 
+
+
+
+template<class EuclideanVector>
+class Anisotropic_transform_3d {
+  typedef Anisotropic_transform_3d<EuclideanVector> Self;
+
+ public:
+  typedef EuclideanVector argument_type;
+  typedef double result_type;
+  
+  /** Sets up the transformation.
+   */
+  Anisotropic_transform_3d(double max_radius, double mid_radius,
+		      double min_radius, 
+		      double alpha, double beta, double theta);
+  
+  Anisotropic_transform_3d(const Self& rhs);
+
+  inline EuclideanVector operator()(const argument_type& vec) const;
+
+
+ private:
+  TNT::Matrix<double> transformation_matrix_;
+
+};
+
+
+template<class EuclideanVector>
+Anisotropic_transform_3d<EuclideanVector>::
+Anisotropic_transform_3d(double max_radius, double mid_radius, 
+		    double min_radius, 
+		    double alpha, double beta, double theta) {
+
+// The thrid argument of TNT matrix constructor is the initialization value
+  TNT::Matrix<double> S(3,3,0.0);
+  TNT::Matrix<double> R1(3,3,0.0);
+  TNT::Matrix<double> R2(3,3,0.0);
+  TNT::Matrix<double> R3(3,3,0.0);
+
+  bool equal_zero=false;
+  bool too_big = false;
+
+  if( max_radius==0 ) {equal_zero=true; max_radius=0.0001; }
+  if( mid_radius==0 ) {equal_zero=true; mid_radius=0.0001; }
+  if( min_radius==0 ) {equal_zero=true; min_radius=0.0001; }
+  if( mid_radius > max_radius ) {too_big=true; mid_radius = max_radius; }
+  if( min_radius > mid_radius ) {too_big=true; min_radius = mid_radius; }
+  
+  if( equal_zero ) {
+    gstl_warning( "one (or more) of the radii was reset to 0.0001 "
+		  << "because it was equal to zero" );
+  }
+  if( too_big ) {
+     gstl_warning( "The ranges values were modified so that"
+		   << " max_radius >= mid_radius >= min_radius" );
+  }
+ 
+
+  gstl_assert( min_radius != 0 && mid_radius != 0 );
+  S(1,1)=1.0;
+  S(2,2)=max_radius/mid_radius;
+  S(3,3)=max_radius/min_radius;
+  
+  // Rotation about Z-axis
+  R1(1,1) =  cos(alpha);
+  R1(2,2) =  cos(alpha);
+  R1(1,2) =  sin(alpha);
+  R1(2,1) = -sin(alpha);
+  R1(3,3) =  1;
+
+  // Rotation about Y'-axis
+  R2(1,1) =  cos(beta);
+  R2(3,3) =  cos(beta);
+  R2(1,3) = -sin(beta);
+  R2(3,1) =  sin(beta);
+  R2(2,2) =  1;
+
+  // Rotation around X"-axis
+  R3(1,1) =  1;
+  R3(2,2) =  cos(theta);
+  R3(3,3) =  cos(theta);
+  R3(2,3) =  sin(theta);
+  R3(3,2) = -sin(theta);
+
+  //transformation_matrix_ = S*((R1*R2)*R3);   //order seems wrong
+  // rotation order: R1 first, then R2 and R3
+  transformation_matrix_ = S*((R3*R2)*R1);
+
+  WRITE_TO_DEBUG_STREAM( "S: " << S << "\n"
+	    << "R1: " << R1 <<  "\n"
+	    << "R2: " << R2 << "\n"
+	    << "R3: " << R3 << "\n"
+	    << "transf: " << transformation_matrix_<< std::endl );
+
+}
+
+
+template<class EuclideanVector>
+Anisotropic_transform_3d<EuclideanVector>::
+Anisotropic_transform_3d(const Self& rhs) 
+  : transformation_matrix_(rhs.transformation_matrix_) {
+}
+
+
+template<class EuclideanVector>
+inline EuclideanVector
+Anisotropic_transform_3d<EuclideanVector>::
+operator()(const argument_type& vec) const {
+
+  gstl_assert(argument_type::dimension >= 3);
+  EuclideanVector v;
+   
+  // Compute the coordinates as double and cast into the actual coordinate_type
+  for(int i=0; i<3; i++){
+    v[i] =  transformation_matrix_(i+1,1) * static_cast<double>(vec[0]) +
+            transformation_matrix_(i+1,2) * static_cast<double>(vec[1]) +
+            transformation_matrix_(i+1,3) * static_cast<double>(vec[2]);
+  }
+
+  return v;
+}
+
+
 #endif

@@ -232,7 +232,7 @@ Non_param_cdf<lower_tail_interp,
               middle_interp,
               upper_tail_interp>::
 inverse(double p) const {
-  gstl_assert( is_valid_cdf( *this ) );
+  gstl_assert_2( is_valid_cdf( *this ) );
 
   // use STL lower_bound algo to where in the p-range, p should be placed
   const_p_iterator pos = std::lower_bound(p_values_.begin(), p_values_.end(), p);

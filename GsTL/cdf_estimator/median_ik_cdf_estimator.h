@@ -105,6 +105,9 @@ public:
     }
 
     bool ok = ccdf.make_valid();
+    if( !ok ) 
+      std::copy( marginal_.begin(), marginal_.end(), ccdf.p_begin() );
+
     return !ok;
   }
 

@@ -33,6 +33,7 @@
 
 #include <GsTL/univariate_stats.h>
 #include <GsTL/cdf/non_param_pdf.h>
+#include <GsTL/math/math_functions.h>
 
 #include <vector>
 #include <algorithm>
@@ -69,7 +70,7 @@ class CI_Bayes_updating {
    typedef NonParamCdf second_argument;
    typedef NonParamCdf return_type;
    
-  /** Constructing a JointCdfEstimatorPOR requires a way of estimating P(A|B),
+  /** Constructing a CI_Bayes_updating requires a way of estimating P(A|B),
    * a map of probabilities P(A|C) for each category, and the marginal distribution
    * P(A). A map of probabilities is a model of PropertyMap, with Geovalues
    * as keys, and P(A|C) as values.
@@ -79,19 +80,19 @@ class CI_Bayes_updating {
    * @param range [first, last) is a range of probability maps.
    * @param marginal is the marginal distribution P(A).
    */
-  template< class PropertyMapIterator >
+  template< class PropertyMapIterator, class NonParamCdf2 >
   CI_Bayes_updating( PropertyMapIterator first, PropertyMapIterator last,
-                     const NonParamCdf& marginal) {
+                     const NonParamCdf2& marginal) {
     std::copy( first, last, std::back_inserter( property_maps_ ) );
     
-    typename NonParamCdf::const_p_iterator it = marginal.p_begin();
+    typename NonParamCdf2::const_p_iterator it = marginal.p_begin();
     for( ; it!= marginal.p_end() ; ++it ) 
       a_.push_back( (1.0 - (*it)) / *it );
   }
 
   /** computes the probabilities P(A|B(u),C(u)). The resulting cdf is stored into ccdf.
    */
-  inline return_type operator()( const first_argument& g,
+/*  inline return_type operator()( const first_argument& g,
 		                 const second_argument& ccdf ) {
    
     NonParamCdf updated_cdf( ccdf ); 
@@ -134,7 +135,75 @@ class CI_Bayes_updating {
 
     return updated_cdf;
   }
-  
+  */
+  /** computes the probabilities P(A|B(u),C(u)). The resulting cdf is stored into ccdf.
+   */
+  inline return_type operator()( const first_argument& g,
+		                 const second_argument& ccdf ) {
+
+    typedef typename NonParamCdf::value_type value_type;
+   
+    const double infinity= -99e30;
+    NonParamCdf updated_cdf( ccdf ); 
+
+    // convert updated_cdf into a pdf
+    Non_param_pdf<value_type> P_AB(updated_cdf);
+
+    // Compute x=bc/a for each category and store the values in x_
+    std::vector<double> x_(updated_cdf.size());
+
+    Non_param_pdf<value_type>::p_iterator p_ab_it = P_AB.p_begin();
+    int i = 0;
+    for( PmapIterator it = property_maps_.begin() ;
+         it != property_maps_.end() ; 
+         ++it, ++i, ++p_ab_it) {
+      // x = b * c / a
+      double p_ab = *p_ab_it;
+      double p_ac = get( *it, g );
+
+      if( GsTL::equals( p_ab, double(0) ) || GsTL::equals( p_ac, double(0) ) ||
+          GsTL::equals( a_[i], double(0) ) ) {
+        x_[i] = infinity;
+        continue;
+      }
+
+      double b = (1 - p_ab)/p_ab;
+      double c = (1 - p_ac)/p_ac;
+      x_[i] = b * c / a_[i];
+    }
+
+    // recover P(A|B,C) from the values of x.
+    Non_param_pdf<value_type> P_ABC(P_AB);
+    i =0 ;
+    for( Non_param_pdf<value_type>::p_iterator p_abc_it = P_ABC.p_begin();
+         p_abc_it!= P_ABC.p_end() ;
+         ++p_abc_it, ++i ) {
+      // p(A|B,C) = 1/(1+x)
+      if( GsTL::equals( x_[i], infinity ) ) {
+        *p_abc_it = 0.0;
+        continue;
+      }
+      *p_abc_it = 1.0 / double(1.0 + x_[i]);
+    }
+
+    // turn the pdf P(A|B,C) into a cdf and put the result into updated_cdf
+    bool ok = make_pdf_valid( P_ABC.p_begin(), P_ABC.p_end() );
+
+	// It is possible that the updated cdf is not valid. For example 
+	// if p(a=0|b)=1 while p(a=0|c)=0 and p(a=1|b)=0 while p(a=1|c)=1,
+	// then p(a=0|b,c)=0 and p(a=1|b,c)=0. In that case, return the marginal 
+	if( !ok ) {
+		int j =0;
+		for( Non_param_pdf<value_type>::p_iterator p_abc_it = P_ABC.p_begin();
+				p_abc_it!= P_ABC.p_end() ;
+				++p_abc_it, ++j ) {
+			// p(A) = 1/(1+a)
+			*p_abc_it = 1.0 / double(1.0 + a_[j]);
+		}
+	}
+	pdf_to_cdf(updated_cdf, P_ABC);
+    return updated_cdf;
+  }
 
  private:
   typedef std::vector<PropertyMap>::iterator PmapIterator;

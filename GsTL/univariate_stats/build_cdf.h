@@ -341,6 +341,8 @@ template <class ForwardIterator>
 bool is_valid_cdf( ForwardIterator begin, ForwardIterator end,
 		   GsTL::continuous_variable_tag ) {
 
+  if( begin == end ) return true;
+
   if( *begin < 0 || *begin > 1 ) return false;
   ForwardIterator last = begin;
   std::advance( last, std::distance( begin, end ) - 1 );

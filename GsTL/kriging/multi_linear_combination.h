@@ -64,7 +64,7 @@ multi_linear_combination(
     const_iterator end = first_neigh->end();
     for( ; it != end ; it++) {
       result += it->property_value() * (*first_weight);
-      first_weight++;
+      ++first_weight;
     }
   }
 

@@ -11,6 +11,14 @@ namespace gstl_debug {
     os << "(" << loc[0] << ", " << loc[1] << ", " << loc[2] << ")";
   }
 
+  template <class InputIterator, class Stream_ >
+  void print_range( InputIterator begin, InputIterator end , 
+                    Stream_& os ) {
+    for( ; begin != end ; ++begin )
+      os << *begin << " ";
+  }
+    
+
   template <class NeighborhoodIterator, class Stream_>
   void print_neighbors( NeighborhoodIterator first, 
                         NeighborhoodIterator last, Stream_& os ) {
@@ -82,6 +90,7 @@ namespace gstl_debug {
 #define WRITE_TO_DEBUG_STREAM( expr ) 
 #define DEBUG_PRINT_LOCATION( label, loc )
 #define DEBUG_PRINT_NEIGHBORHOOD( label, pointer )
+#define DEBUG_PRINT_RANGE( label, begin, end )
 
 #else
 
@@ -111,6 +120,12 @@ namespace gstl_debug {
   gstl_debug::Global_stream<std::ofstream>::instance() << std::endl; \
 } 
 
+#define DEBUG_PRINT_RANGE( label, begin, end ) \
+{ \
+  gstl_debug::Global_stream<std::ofstream>::instance() << label << ": "; \
+  gstl_debug::print_range( begin, end, gstl_debug::Global_stream<std::ofstream>::instance() ); \
+  gstl_debug::Global_stream<std::ofstream>::instance() << std::endl; \
+}
 
 #endif
 
@@ -118,3 +133,4 @@ namespace gstl_debug {
 
 
 #endif
+

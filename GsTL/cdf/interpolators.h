@@ -33,6 +33,7 @@
 #define __GSTL_CDF_INTERPOLATORS_H__
 
 #include <GsTL/math/math_functions.h>
+#include <GsTL/utils/gstl_error_messages.h>
 
 #include <cmath>
 #include <memory>

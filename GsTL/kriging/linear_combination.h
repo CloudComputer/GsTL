@@ -51,7 +51,8 @@ double
 linear_combination(InputIterator begin_weights, InputIterator end_weights,
 		   const Neighborhood& neighbors)
 {
-  double result=0.0;
+  //double result=0.0;
+  typename Neighborhood::value_type::property_type result(0);
   
   typename Neighborhood::const_iterator it= neighbors.begin();
   typename Neighborhood::const_iterator end = neighbors.end();

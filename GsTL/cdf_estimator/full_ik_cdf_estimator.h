@@ -5,6 +5,7 @@
 #include <GsTL/kriging.h>
 #include <GsTL/matrix_library/matrix_lib_traits.h>
 #include <GsTL/matrix_library/gstl_tnt_lib.h>
+#include <GsTL/utils/debug_tools.h>
 
 #include <vector>
 #include <iterator>
@@ -65,15 +66,25 @@ public:
         cokriging_weights<MatrixLibrary>( weights_, 
                                           u.location(), first_neigh, current_plus_2,
                                           covar_sets_[k], kconstraints_ );
-      if( status != 0 ) return status;
+      if( status != 0 ) {
+        std::copy( marginal_.begin(), marginal_.end(), ccdf.p_begin() );
+        return status;
+      }
+      
+      DEBUG_PRINT_RANGE( "weights: ", weights_.begin(), weights_.end() );
 
       *p_it = combiners_[k]( weights_.begin(), weights_.end(),
                              first_neigh, current_plus_2 );
+      WRITE_TO_DEBUG_STREAM( "prob=" << *p_it << "\n" );
 
       std::advance( first_neigh, 2 );
     }
 
     bool ok = ccdf.make_valid();
+    if( !ok ) {
+      WRITE_TO_DEBUG_STREAM( "\nmake_cdf_valid failed\n\n"  );
+      std::copy( marginal_.begin(), marginal_.end(), ccdf.p_begin() );
+    }
     return !ok;
   }
 

@@ -71,7 +71,10 @@ int main() {
 
   for(int i=0; i<5; i++)
     for(int j=0; j<5; j++) {
-      Location center(i,j);
+      Location center( i,j);
+      CartesianGrid::geovalue_type center_gval( &grid );
+      center_gval.set_location( center );
+      
       window.find_neighbors(center);
       for(WindowNeighborhood::iterator it=window.begin(); 
 	  it!=window.end(); ++it) {
@@ -85,7 +88,7 @@ int main() {
       }
       Cdf ccdf(2);
 
-      scan_estimator(center, window, ccdf);
+      scan_estimator(center_gval, window, ccdf);
       
       std::cout << "cdf at " << center << " : ";
       for(Cdf::p_iterator p_it=ccdf.p_begin(); p_it!=ccdf.p_end(); p_it++)

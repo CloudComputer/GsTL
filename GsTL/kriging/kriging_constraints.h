@@ -121,13 +121,13 @@ template <
           class MatrixLibrary=GSTL_TNT_lib
          >
 class Kriging_constraints_impl {
- private:
+ protected:
  typedef Neighborhood_ N;
  typedef Location_ L;
  typedef WeightsVector W;
  typedef MatrixLibrary M;
  typedef Kriging_constraints_impl<N,L,W,M> Self;
- typedef WeightsVector::iterator Iterator_;
+ typedef typename WeightsVector::iterator Iterator_;
 
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
@@ -195,8 +195,8 @@ class SKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
   }
 
   virtual double kriging_variance_contrib( const Location_& center,
-                                           Iterator_ weights_begin,
-                                           Iterator_ weights_end ) const {
+                                           typename BaseClass::Iterator_ weights_begin,
+                                           typename BaseClass::Iterator_ weights_end ) const {
     return 0.0;
   }
 };
@@ -244,8 +244,8 @@ class OKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
   }
 
   virtual double kriging_variance_contrib( const Location_& center,
-                                           Iterator_ weights_begin,
-                                           Iterator_ weights_end ) const {
+                                           typename BaseClass::Iterator_ weights_begin,
+                                           typename BaseClass::Iterator_ weights_end ) const {
     return *weights_begin;
   }
 };
@@ -304,8 +304,8 @@ class KTConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
   }
 
   virtual double kriging_variance_contrib( const Location_& center,
-                                           Iterator_ weights_begin,
-                                           Iterator_ weights_end ) const {
+                                           typename BaseClass::Iterator_ weights_begin,
+                                           typename BaseClass::Iterator_ weights_end ) const {
     return constraints_.kriging_variance_contrib( center, weights_begin, weights_end );
   }
   

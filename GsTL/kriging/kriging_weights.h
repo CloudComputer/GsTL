@@ -474,7 +474,7 @@ int build_kriging_system(
 			  KrigingConstraints& Kconstraints
 			  ) {
 
-  iint nb_conditioning_data = Kconstraints(A, b,
+  int nb_conditioning_data = Kconstraints(A, b,
 	                                   center, neighbors);
   
   build_invariant(A, b,

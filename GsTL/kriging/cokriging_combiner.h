@@ -147,6 +147,8 @@ class CoSK_combiner : public CoKriging_combiner_impl<InputIterator,InputIterator
 	std::accumulate( begin_weights, end, 0.0 );
       sum *= means_[attribute];
       mean_contribution += sum;
+
+      std::advance( begin_weights, first_neigh->size() );
     }
     mean_contribution = means_[0] - mean_contribution;
     return val + mean_contribution;

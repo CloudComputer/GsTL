@@ -32,6 +32,10 @@
 
 #include <cmath>
 
+#undef INFINITY
+#undef PI
+#undef EPSILON
+
 namespace GsTL
 {
 
@@ -65,10 +69,18 @@ namespace GsTL
   }
 
   inline bool equals( double d1, double d2, double precision=EPSILON ) {
+    if( d1 == float(0) ) {
+      if( d2 == float(0) ) return true;
+      return false;
+    }
     return ( abs( d1-d2 )/abs(d1) < precision );
   }
   
   inline bool equals( float d1, float d2, float precision=0.00001 ) {
+    if( d1 == double(0) ) {
+      if( d2 == double(0) ) return true;
+      return false;
+    }
     return ( abs( d1-d2 )/abs(d1) < precision );
   }
 } // end of namespace GsTL

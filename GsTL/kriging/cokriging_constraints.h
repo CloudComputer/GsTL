@@ -124,7 +124,7 @@ template <
           class MatrixLibrary=GSTL_TNT_lib
          >
 class CoKriging_constraints_impl {
- private:
+ protected:
  typedef InputIterator N;
  typedef Location_ L;
  typedef WeightsVector W;
@@ -205,8 +205,8 @@ class Co_SKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
   }
 
   virtual double kriging_variance_contrib( const Location_& center,
-                                           Iterator_ weights_begin,
-                                           Iterator_ weights_end ) const {
+                                           typename BaseClass::Iterator_ weights_begin,
+                                           typename BaseClass::Iterator_ weights_end ) const {
     return 0.0;
   }
 
@@ -258,8 +258,8 @@ class Co_OKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
   }
 
   virtual double kriging_variance_contrib( const Location_& center,
-                                           Iterator_ weights_begin,
-                                           Iterator_ weights_end ) const {
+                                           typename BaseClass::Iterator_ weights_begin,
+                                           typename BaseClass::Iterator_ weights_end ) const {
     return *weights_begin;
   }
 

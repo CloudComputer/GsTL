@@ -156,7 +156,7 @@ Categ_non_param_cdf<T>::inverse(double p) const
   gstl_assert( is_valid_cdf( *this ) );
 
   int clas = -1;
-  while( p > 0 && clas+1 != p_values_.size() ) {
+  while( p > 0 && clas+1 != int(p_values_.size()) ) {
     ++clas;
     p -= p_values_[clas];
   }

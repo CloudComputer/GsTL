@@ -101,7 +101,7 @@ class Gaussian_cdf_coKestimator{
 
   CovarianceSet cov_set_ ;
   KrigingConstraints Kconstr_ ;
-  Combiner& combiner_;
+  Combiner combiner_;
   mutable std::vector<double> weights_;
  
 }; // end of class gaussian_cdf_Kestimator
