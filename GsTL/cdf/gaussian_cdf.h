@@ -112,7 +112,7 @@ inline Gaussian_cdf::value_type
   // specific cases  
   if (p<=lim) return -INFINITY;
   if (p>=1-lim) return INFINITY; 
-  if(p==0.5) return 0.0;
+  if(p==0.5) return mean_;
   
   double tmp_p=p;
   
