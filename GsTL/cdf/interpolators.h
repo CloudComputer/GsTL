@@ -243,7 +243,7 @@ public:
     if( GsTL::equals( z_min_, z1 ) ) return p_min_;
     if( z <= z_min_ ) return p_min_;
 
-    return p1 + (p1 - p_min_) * std::pow( (z1-z)/(z1-z_min_), omega_ );
+    return p1 - (p1 - p_min_) * std::pow( (z1-z)/(z1-z_min_), omega_ );
   }
 
 private:
