@@ -4,6 +4,8 @@
 #include <GsTL/kriging.h>
 #include <GsTL/matrix_library/matrix_lib_traits.h>
 #include <GsTL/matrix_library/gstl_tnt_lib.h>
+#include <GsTL/utils/gstl_error_messages.h>
+#include <GsTL/cdf/cdf_basics.h>
 
 #include <vector>
 #include <iterator>
@@ -57,7 +59,7 @@ public:
   
     typedef typename NonParametricCdf::p_iterator CdfIterator;
 
-    gstl_assert( ccdf.size() == marginal_.size() );
+    gstl_assert( ccdf.size() == int(marginal_.size()) );
 
     // First check that there are conditioning data. If not, return the
     // marginal

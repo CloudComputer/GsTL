@@ -321,8 +321,8 @@ operator()(
 
       int status = 
       	kriging_weights<MatrixLibrary>( weights_,
-			                              		u.location(), *first_neigh,
-					                              *current_covar, Kconstraints );
+			                u.location(), *first_neigh,
+					*current_covar, Kconstraints );
       
       // If the kriging system could not be solved, use the marginal
       if(status!=0) {
