@@ -80,7 +80,7 @@ namespace gstl_debug {
 #define OPEN_DEBUG_STREAM( file )
 #define WRITE_TO_DEBUG_STREAM( expr ) 
 #define DEBUG_PRINT_LOCATION( label, loc )
-#define DEBUG_PRINT_NEIGHBORHOOD( pointer )
+#define DEBUG_PRINT_NEIGHBORHOOD( label, pointer )
 
 #else
 
