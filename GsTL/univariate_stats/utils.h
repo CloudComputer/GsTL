@@ -36,6 +36,30 @@ double variance( InputIterator begin, InputIterator end, T* mean = 0 ) {
 }
 
 
+/** This function computes the covariance of a range of values.
+* If pointer \c means is not null, the means of both ranges are stored
+* in *means.
+*/
+template <class InputIterator, class InputIterator2>
+double covariance( InputIterator begin, InputIterator end, 
+                   InputIterator2 begin2, 
+		   std::pair<double,double>* means = 0 ) {
+  double res = 0;
+  double mean1_ = 0;
+  double mean2_ = 0;
+  double count = 0;
+  for( ; begin != end ; ++begin, count++, ++begin2 ) {
+    res += (*begin) * (*begin2);
+    mean1_ += *begin;
+    mean2_ += *begin2;
+  }
+
+  mean1_ /= count;
+  mean2_ /= count;
+  if ( means ) *means = std::make_pair(mean1_, mean2_);
+  return res / ( count - 1 ) - count/(count-1)*mean1_*mean2_;
+}
+
 } // end of GsTL namespace
 
 #endif
