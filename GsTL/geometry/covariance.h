@@ -130,7 +130,7 @@ class Spherical_covariance : public Basic_model<Location> {
   }
 
   virtual Basic_model<Location>* clone() const {
-    return new Spherical_covariance<Location>(a_,c_);
+    return new Spherical_covariance<Location>(this->a_, this->c_);
   }
 
   virtual result_type compute( const EuclideanVector& vec ) const;
@@ -159,7 +159,7 @@ class Exponential_covariance : public Basic_model<Location>{
   }
 
   virtual Basic_model<Location>* clone() const {
-    return new Exponential_covariance<Location>(a_,c_);
+    return new Exponential_covariance<Location>(this->a_, this->c_);
   }
 
   virtual result_type compute(const EuclideanVector& vec) const;
@@ -189,7 +189,7 @@ class Gaussian_covariance : public Basic_model<Location>{
   }
 
   virtual Basic_model<Location>* clone() const {
-    return new Gaussian_covariance<Location>(a_,c_);
+    return new Gaussian_covariance<Location>(this->a_, this->c_);
   }
 
   virtual result_type compute(const EuclideanVector& vec) const;
@@ -234,14 +234,14 @@ class Pure_nugget : public Covariance_base<Location>{
   inline const double& nugget() const  {return n_; }
 
   virtual result_type compute(const EuclideanVector& vec) const{
-    if(square_euclidean_norm(vec) <= a_ )
+    if(square_euclidean_norm(vec) <= this->a_ )
       return n_;
     else
       return 0.0;
   };
   
   virtual result_type isotrop_compute(double h) const {
-    if(h <= a_ )
+    if(h <= this->a_ )
       return n_;
     else
       return 0.0;

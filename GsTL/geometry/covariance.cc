@@ -40,19 +40,19 @@ typename Spherical_covariance<Location>::result_type
 Spherical_covariance<Location>::compute(const Spherical_covariance<Location>::EuclideanVector& vec) const{
   double h=euclidean_norm(vec);
 
-  if(h>=a_) 
+  if( h >= this->a_ ) 
     return 0;
   else
-    return c_ * (1 -  1.5*h/a_ + 0.5*pow(h/a_ , 3));
+    return this->c_ * (1 -  1.5*h/this->a_ + 0.5*pow(h/this->a_ , 3));
 }
 
 template<class Location>
 typename Spherical_covariance<Location>::result_type 
 Spherical_covariance<Location>::isotrop_compute(double h) const{
-  if(h>=a_) 
+  if( h >= this->a_ ) 
     return 0.0;
   else
-    return c_ * (1 -  1.5*h/a_ + 0.5*pow(h/a_ , 3));
+    return this->c_ * (1 -  1.5*h/this->a_ + 0.5*pow(h/this->a_ , 3));
 }
 
 
@@ -64,13 +64,13 @@ typename Exponential_covariance<Location>::result_type
 Exponential_covariance<Location>::compute(const typename Exponential_covariance<Location>::
 					        EuclideanVector& vec) const{
   double h=euclidean_norm(vec);
-  return c_ * exp(-3*h/a_) ;
+  return this->c_ * exp(-3*h/this->a_) ;
 }
  
 template<class Location>
 typename Exponential_covariance<Location>::result_type 
 Exponential_covariance<Location>::isotrop_compute(double h) const{
-  return c_ * exp(-3*h/a_) ;
+  return this->c_ * exp(-3*h/this->a_) ;
 }
 
 //--------------------
@@ -81,13 +81,13 @@ typename Gaussian_covariance<Location>::result_type
 Gaussian_covariance<Location>::compute(const typename Gaussian_covariance<Location>::
 				             EuclideanVector& vec) const{
   double h=euclidean_norm(vec);
-  return c_ * exp( -pow(3*h/a_ ,2) );
+  return this->c_ * exp( -pow(3*h/this->a_ ,2) );
 }
 
 template<class Location>
 typename Gaussian_covariance<Location>::result_type 
 Gaussian_covariance<Location>::isotrop_compute(double h) const{
-  return c_ * exp( -pow(3*h/a_ ,2) );
+  return this->c_ * exp( -pow(3*h/this->a_ ,2) );
 }
 
 

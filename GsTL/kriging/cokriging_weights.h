@@ -99,7 +99,7 @@ cokriging_weights(
 			 covar );
  
   // Resize the output vector if necessary  
-  if(weights.size() != A.num_cols())
+  if( weights.size() != A.num_cols() )
     weights.resize(A.num_cols());
   
   

@@ -247,7 +247,7 @@ sequential_simulation_2(
 
     neighbors.find_neighbors( *begin );
 
-    int status = estim( *it, *neighbors, ccdf);
+    int status = estim( *begin, *neighbors, ccdf);
 
     if(status == 0)
       samp(*begin, ccdf);

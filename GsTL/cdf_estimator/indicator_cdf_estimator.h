@@ -120,7 +120,7 @@ class Indicator_cdf_estimator{
 
   Indicator_cdf_estimator& operator=(const Indicator_cdf_estimator& rhs) {
     covariances_  = rhs.covariances_;
-    indicator_ = indicator_function ;
+    indicator_ = rhs.indicator_function ;
     marginal_probas_ = rhs.marginal_probas_ ;
     weights_.reserve(rhs.weights_.size());
   }

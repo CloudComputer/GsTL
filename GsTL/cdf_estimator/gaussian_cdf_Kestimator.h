@@ -127,7 +127,7 @@ class Gaussian_cdf_Kestimator_rec{
 
   Gaussian_cdf_Kestimator_rec(const Gaussian_cdf_Kestimator_rec& rhs)
   : cov_(rhs.cov_), Kconstr_(rhs.Kconstr_), combiner_(rhs.combiner_), weights_(30),
-  krig_variance_output_( krig_variance_output ) {
+  krig_variance_output_( rhs.krig_variance_output_ ) {
   }
 			 
   Gaussian_cdf_Kestimator_rec& operator=(const Gaussian_cdf_Kestimator_rec& rhs) {
@@ -135,7 +135,7 @@ class Gaussian_cdf_Kestimator_rec{
     Kconstr_=rhs.Kconstr_;
     combiner_ = rhs.combiner_;
     weights_.reserve(rhs.weights_.size());
-    krig_variance_output_ = krig_variance_output ;
+    krig_variance_output_ = rhs.krig_variance_output_ ;
 
     return *this;
   }

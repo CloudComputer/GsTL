@@ -39,8 +39,8 @@ public:
     window_.clear_geometry();
  
 //    (*dbgstream_) << "data event geometry:  "; 
-    for( std::vector<EuclideanVector>::iterator geom_it = extracted_geometry.begin();
-         geom_it != extracted_geometry.end(); ++geom_it ) {
+    typename std::vector<EuclideanVector>::iterator geom_it = extracted_geometry.begin();
+    for( ; geom_it != extracted_geometry.end(); ++geom_it ) {
 //      (*dbgstream_) << "(" << geom_it->x() << "," << geom_it->y() << "," << geom_it->z() << ")  ";
       window_.add_geometry_vector( *geom_it );
     }

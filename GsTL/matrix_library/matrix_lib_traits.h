@@ -56,20 +56,28 @@ struct matrix_lib_traits{
   typedef typename lib_name::vector Vector;
 
   template<class RandomIterator>
-  static inline int cholesky_solve(Matrix& A, Vector& b, RandomIterator solution){}
+  static inline int cholesky_solve(Matrix& A, Vector& b, RandomIterator solution){
+    return 1;
+  }
 
   // A version that does not modify b
   template<class RandomIterator>
-  static inline int const_cholesky_solve(Matrix& A, const Vector& b, RandomIterator solution){}
+  static inline int const_cholesky_solve(Matrix& A, const Vector& b, RandomIterator solution){
+    return 1;
+  }
 
 
   // A general method for solving dense systems
   template<class RandomIterator>
-  static inline int solve(Matrix& A, Vector& b, RandomIterator solution){}
+  static inline int solve(Matrix& A, Vector& b, RandomIterator solution){
+    return 1;
+  }
 
   // A version that does not modify b
   template<class RandomIterator>
-  static inline int const_solve(Matrix& A, const Vector& b, RandomIterator solution){}
+  static inline int const_solve(Matrix& A, const Vector& b, RandomIterator solution){
+    return 1;
+  }
 
 };
 
@@ -132,6 +140,7 @@ struct matrix_lib_traits< TNT_lib<T> >{
 //__________________________________________
 // Specialization for GsTL_TNT
 
+template<>
 struct matrix_lib_traits<GSTL_TNT_lib>{
   
   typedef GSTL_TNT_lib::Subscript              Subscript;

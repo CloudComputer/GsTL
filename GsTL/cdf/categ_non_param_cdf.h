@@ -66,11 +66,11 @@ class Categ_non_param_cdf : public Non_parametric_cdf<T> {
 
   Categ_non_param_cdf( unsigned int categories_count ) 
   {
-    z_values_.resize( categories_count );
+    this->z_values_.resize( categories_count );
     for( unsigned int i = 0; i < categories_count; i++ )
-      z_values_[i] = i;
+      this->z_values_[i] = i;
     
-    p_values_.resize( categories_count );
+    this->p_values_.resize( categories_count );
   };
 
 
@@ -78,13 +78,13 @@ class Categ_non_param_cdf : public Non_parametric_cdf<T> {
   Categ_non_param_cdf( unsigned int categories_count,
 		       P_iterator p_begin) 
   {
-    z_values_.resize( categories_count );
-    p_values_.resize( categories_count );
+    this->z_values_.resize( categories_count );
+    this->p_values_.resize( categories_count );
 
     for( unsigned int i = 0; i < categories_count; i++ )
       {
-	z_values_[i] = i;
-	p_values_[i] = *p_begin;
+	this->z_values_[i] = i;
+	this->p_values_[i] = *p_begin;
 	p_begin++;
       }
   };
@@ -110,12 +110,12 @@ class Categ_non_param_cdf : public Non_parametric_cdf<T> {
 template<class T>
 void Categ_non_param_cdf<T>::z_set( unsigned int categories_count )
 {
-  p_values_.clear();
-  z_values_.resize( categories_count );
-  p_values_.resize( categories_count );
+  this->p_values_.clear();
+  this->z_values_.resize( categories_count );
+  this->p_values_.resize( categories_count );
 
   for( unsigned int i = 0; i < categories_count; i++ )
-    z_values_[i] = i;
+    this->z_values_[i] = i;
 }
 
 
@@ -126,12 +126,12 @@ void Categ_non_param_cdf<T>::p_set(forward_iterator p_begin,
 				   forward_iterator p_end)
 {
   unsigned int categories_count = std::distance( p_begin, p_end );
-  gstl_assert( p_values_.size() == categories_count );
+  gstl_assert( this->p_values_.size() == categories_count );
   
   int i=0;
   for(forward_iterator it = p_begin; it!=p_end; it++) {
-    gstl_assert( i < static_cast<int>(p_values_.size()) );
-    p_values_[i++] = *it;
+    gstl_assert( i < static_cast<int>( this->p_values_.size()) );
+    this->p_values_[i++] = *it;
   }
 }
 
@@ -142,8 +142,8 @@ double Categ_non_param_cdf<T>::prob(value_type z) const
   gstl_assert( is_valid_cdf( *this ) );
 
   unsigned int categ = static_cast<unsigned int>( z );
-  gstl_assert( categ < p_values_.size() );
-  return p_values_[ categ ];
+  gstl_assert( categ < this->p_values_.size() );
+  return this->p_values_[ categ ];
   
 }
 
@@ -156,9 +156,9 @@ Categ_non_param_cdf<T>::inverse(double p) const
   gstl_assert( is_valid_cdf( *this ) );
 
   int clas = -1;
-  while( p > 0 && clas+1 != int(p_values_.size()) ) {
+  while( p > 0 && clas+1 != int(this->p_values_.size()) ) {
     ++clas;
-    p -= p_values_[clas];
+    p -= this->p_values_[clas];
   }
 
   return clas;
