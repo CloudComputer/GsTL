@@ -98,10 +98,11 @@ int kriging_weights(
   typename MatrixLib::Symmetric_matrix A;
   typename MatrixLib::Vector b;
   
-  build_kriging_system(A,b,
-		       weights, 
-		       center, neighbors,
-		       covar, Kconstraints);
+  int conditioning_data = 
+    build_kriging_system(A,b,
+		         weights, 
+		         center, neighbors,
+		         covar, Kconstraints);
 
   // solve the system
   int status = 
@@ -113,7 +114,10 @@ int kriging_weights(
   // Compute the kriging variance
   if(status == 0) {
     double C0=covar(center,center);
-    kriging_variance = compute_kriging_variance(weights.begin(), b, C0);
+    kriging_variance = 
+      compute_kriging_variance(weights.begin(), 
+                               weights.begin()+conditioning_data, weights.end(),
+                               b, Kconstraints, center, C0);
   }
   else
     kriging_variance = -99;
@@ -275,10 +279,11 @@ int kriging_weights_2(
   typename MatrixLib::Symmetric_matrix A;
   typename MatrixLib::Vector b;
   
-  build_kriging_system(A,b,
-		       weights, 
-		       center, neighbors,
-		       covar, covar_rhs, Kconstraints);
+  int conditioning_data = 
+    build_kriging_system(A,b,
+     		         weights, 
+		         center, neighbors,
+		         covar, covar_rhs, Kconstraints);
 
   // solve the system
   int status = 
@@ -290,7 +295,10 @@ int kriging_weights_2(
   // Compute the kriging variance
   if(status == 0) {
     double C0=covar(center,center);
-    kriging_variance = compute_kriging_variance(weights.begin(), b, C0);
+    kriging_variance =
+      compute_kriging_variance(weights.begin(), 
+                               weights.begin()+conditioning_data, weights.end(),
+                               b, Kconstraints, center, C0);
   }
   else
     kriging_variance = -99;
@@ -417,7 +425,7 @@ template<
          class KrigingConstraints,
          class Vector
         >
-void build_kriging_system(
+int build_kriging_system(
 			  SymmetricMatrix& A, 
 			  MatVector& b,
 			  Vector& weights,
@@ -427,8 +435,8 @@ void build_kriging_system(
 			  KrigingConstraints& Kconstraints
 			  ) {
 
-  Kconstraints(A, b,
-	       center, neighbors);
+  int nb_conditioning_data = Kconstraints(A, b,
+	                                  center, neighbors);
   
   build_invariant(A,b,
 		  center,
@@ -441,6 +449,7 @@ void build_kriging_system(
   if( static_cast<int>(weights.size()) != static_cast<int>(A.num_cols()) )
     weights.resize(A.num_cols());
 
+  return nb_conditioning_data;
 }
 
 
@@ -455,7 +464,7 @@ template<
          class KrigingConstraints,
          class Vector
         >
-void build_kriging_system(
+int build_kriging_system(
 			  SymmetricMatrix& A, 
 			  MatVector& b,
 			  Vector& weights,
@@ -465,8 +474,8 @@ void build_kriging_system(
 			  KrigingConstraints& Kconstraints
 			  ) {
 
-  Kconstraints(A, b,
-	       center, neighbors);
+  iint nb_conditioning_data = Kconstraints(A, b,
+	                                   center, neighbors);
   
   build_invariant(A, b,
 		              center,
@@ -479,6 +488,7 @@ void build_kriging_system(
   if( static_cast<int>(weights.size()) != static_cast<int>(A.num_cols()) )
     weights.resize(A.num_cols());
 
+  return nb_conditioning_data;
 }
 
 
