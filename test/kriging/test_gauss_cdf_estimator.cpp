@@ -147,7 +147,7 @@ private:
 
 int main() {
 
-  Point center(41,29);
+  Node center_node(41,29,-99);
 
   // The numbering of the nodes corresponds to gslib's output order
   Node P5(38,28,0.5740);
@@ -204,7 +204,7 @@ int main() {
   Gaussian_cdf_Kestimator<covariance,
     neighborhood,KConstraints,TNT>  gK_estimator( covar, constraints, sk_combiner ); 
   
-  gK_estimator(center, voisin, g_ccdf);
+  gK_estimator(center_node, voisin, g_ccdf);
   
   std::cout << "gaussian cdf : mean= " << g_ccdf.mean() << "   variance= " 
 	    << g_ccdf.variance() << std::endl;

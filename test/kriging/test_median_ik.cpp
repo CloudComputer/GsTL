@@ -118,7 +118,8 @@ private:
 
 int main() {
 
-  Point center(41,29);
+  //Point center(41,29);
+  Node center(41,29,-99);
 
   // The numbering of the nodes corresponds to gslib's output order
   Node P5(38,28,0.5740);
@@ -176,7 +177,8 @@ int main() {
   double marginal[5]={0.2, 0.3, 0.1, 0.1, 0.3};
   double z_values[5] = {0.1, 0.4, 0.9, 1.4, 2.1};
 
-  CdfEstimator indicator_estimator( covar, 
+  CdfEstimator indicator_estimator( marginal, marginal+5,
+                                    covar, 
                                     combiners.begin(), combiners.end(), 
                                     kconstraints );
   Non_param_cdf<> ccdf(z_values, z_values+5);

@@ -115,7 +115,8 @@ private:
 
 int main() {
 
-  Point center(41,29);
+  //Point center(41,29);
+  Node center(41,29,-99);
 
   // The numbering of the nodes corresponds to gslib's output order
   Node P5(38,28,0.5740);
