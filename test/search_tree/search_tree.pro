@@ -11,4 +11,4 @@ SOURCES += benchmark1.cc \
            geovalue.cc 
 TARGET = benchmark1
 
-INCLUDEPATH += ../../include
+INCLUDEPATH += ../../

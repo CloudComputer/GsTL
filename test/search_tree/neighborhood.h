@@ -21,6 +21,7 @@ class neighborhood{
  public:
 
   typedef std::vector<geovalue>::iterator iterator;
+  typedef std::vector<geovalue>::const_iterator const_iterator;
   typedef geovalue value_type;
 
   neighborhood(cartesian_grid& grid, int window_size, int* window_coord) : grid_(grid), 
@@ -33,6 +34,8 @@ class neighborhood{
 
   inline iterator begin() {return neigh_.begin();}
   inline iterator end() {return neigh_.end();}
+  inline const_iterator begin() const {return neigh_.begin();}
+  inline const_iterator end() const {return neigh_.end();}
   inline unsigned int size() {return neigh_.size();}
   inline bool empty() {return neigh_.empty();}
 

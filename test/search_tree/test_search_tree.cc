@@ -1,4 +1,5 @@
 #include <GsTL/grid/cartesian_grid.h>
+#include <GsTL/grid/geovalue.h>
 #include <GsTL/grid/property_server.h>
 #include <GsTL/grid/window_neighborhood.h>
 #include <GsTL/grid/multigrid_view.h>
@@ -33,6 +34,7 @@ void initialize(Grid& grid, std::string new_property_name,
 int main(){
   
   typedef cartesian_grid<property_server<short int> > CartesianGrid;
+  typedef CartesianGrid::geovalue_type geovalue_type;
   typedef CartesianGrid::grid_location_type Location;
   typedef Location::difference_type EuclideanVector;
 
@@ -87,9 +89,10 @@ int main(){
   Cdf ccdf(2);
 
   Location center(2,3);
+  geovalue_type center_node = grid(center,0);
   neighbors.find_neighbors(center);
 
-  tree(center, neighbors, ccdf);
+  tree(center_node, neighbors, ccdf);
 
   std::cout << "cdf at " << center << " : ";
   for(Cdf::p_iterator p_it=ccdf.p_begin(); p_it!=ccdf.p_end(); p_it++)

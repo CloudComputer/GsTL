@@ -41,10 +41,11 @@ int main(){
   non_param_cdf ccdf(2);
 
   location_2d centre(0,0);
+  geovalue centre_node(&grid,0);
   neighbors.find_neighbors( centre );
 
   std::cout << " ccdf at location centre:  " ;
-  tree(centre, neighbors, ccdf);
+  tree(centre_node, neighbors, ccdf);
   for(non_param_cdf::p_iterator p_it=ccdf.p_begin(); p_it!=ccdf.p_end(); p_it++)
     std::cout << *p_it << " ";
   std::cout << std::endl << std::endl;
@@ -58,7 +59,8 @@ int main(){
       int x= int(drand48()*4);
       int y= int(drand48()*4);
       
-      location_2d unknown(x,y);
+      //location_2d unknown(x,y);
+      geovalue unknown = grid(x,y);
       neighbors.find_neighbors(unknown);
       tree(unknown, neighbors, ccdf);
     }
