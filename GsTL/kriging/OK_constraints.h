@@ -49,12 +49,12 @@ class OK_constraints{
    * member, sets their dimensions, and fill in the lagrangian
    * part of the system.
    *
-   * @param A is Symmetric Matrix. It will be resized by SK constraints.
+   * @param A is the kriging matrix
    * @param b is a Vector, the RHS of the kriging system. It will be resized
-   * by SK constraints.
-   * @param center is not used by the SK engine.
+   * by OK constraints.
+   * @param center is not used by the OK engine.
    * @param [first_neigh,last_neigh) is a range of Neighborhoods.
-   * @return the final size of the kriging system
+   * @return the total number of conditioning data
    */ 
   template <
           class InputIterator,
@@ -84,6 +84,21 @@ class OK_constraints{
 			   ) const {
     return this->operator()( A,b,center, &neighbors, &neighbors+1 );
   }
+
+
+
+  /** Compute the contribution to the kriging variance of the Lagrange
+   * parameters.
+   * \c center is the location for which the kriging system is solved,
+   * [begin_weights,end_weights) is a range of lagrange weights. 
+  */ 
+  template< class Location_, class InputIterator > 
+  double kriging_variance_contrib( const Location_& center, 
+                                   InputIterator begin_weights,  
+                                   InputIterator end_weights ) const {
+    return *begin_weights;
+  }
+
 
 }; // end of class OK_engine
 

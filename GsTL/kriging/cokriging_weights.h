@@ -114,7 +114,10 @@ cokriging_weights(
   // the cokriging system. 
   if(status == 0) {
     double C0=covar(1,1, center,center);
-    kriging_variance = compute_kriging_variance(weights.begin(), b, C0);
+    kriging_variance = 
+      compute_kriging_variance(weights.begin(),
+                               weights.begin()+nb_conditioning_data, weights.end(),
+                               b, Kconstraints, center, C0);
   }
   else
     kriging_variance = -99;

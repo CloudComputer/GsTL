@@ -35,6 +35,8 @@
 #pragma interface
 #endif
 
+#include <GsTL/utils/gstl_error_messages.h>
+
 #include <iterator>
 
 template<class ForwardIterator>
@@ -66,12 +68,12 @@ class KT_constraints{
    * However, as all the kriging engines share the same interface,
    * a range of neighborhood is passed.
    *
-   * @param A is Symmetric Matrix. It will be resized by SK constraints.
+   * @param A is the kriging matrix. 
    * @param b is a Vector, the RHS of the kriging system. It will be resized
-   * by SK constraints.
-   * @param center is not used by the SK engine.
+   * by KT constraints.
+   * @param center is the location being krigged
    * @param [first_neigh,last_neigh) is a range of Neighborhoods.
-   * @return the final size of the kriging system
+   * @return the total number of conditioning data
    */ 
   template <
             class InputIterator,
@@ -101,7 +103,27 @@ class KT_constraints{
 			   ) const {
     return this->operator()( A,b,center, &neighbors, &neighbors+1 );
   }
-  
+
+
+
+  /** Compute the contribution to the kriging variance of the Lagrange
+   * parameters.
+   * \c center is the location for which the kriging system is solved,
+   * [begin_weights,end_weights) is a range of lagrange weights. 
+  */ 
+  template< class Location_, class InputIterator > 
+  double kriging_variance_contrib( const Location_& center, 
+                                   InputIterator begin_weights,  
+                                   InputIterator end_weights ) const {
+    double contrib = 0.0;
+    for( ForwardIterator mean_it = mean_first_; mean_it != mean_last_ ; 
+         ++mean_it, ++begin_weights ) {
+      gstl_assert( begin_weights != end_weights );
+      contrib += (*mean_it)( center ) * (*begin_weights);
+    }
+    return contrib;
+  }  
+
 
  private:
   ForwardIterator mean_first_;

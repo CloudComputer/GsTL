@@ -12,6 +12,7 @@
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector,
           class MatrixLibrary
          >
 class CoKriging_constraints_impl;
@@ -20,6 +21,7 @@ class CoKriging_constraints_impl;
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector,
           class MatrixLibrary
          >
 class Co_OKConstraints_impl;
@@ -30,14 +32,18 @@ class Co_OKConstraints_impl;
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class CoKriging_constraints {
  private:
   typedef InputIterator N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary M;
-  typedef CoKriging_constraints_impl<N,L,M> BaseClass;
+  typedef CoKriging_constraints_impl<N,L,W,M> BaseClass;
+  typedef CoKriging_constraints<N,L,W,M> Self;
+  typedef typename WeightsVector::iterator Iterator_;
     
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
@@ -50,10 +56,10 @@ class CoKriging_constraints {
     if( impl )
       impl_ = impl->clone();
     else
-      impl_ = new Co_OKConstraints_impl<N,L,M> ; 
+      impl_ = new Co_OKConstraints_impl<N,L,W,M> ; 
   }
 
-  CoKriging_constraints( const CoKriging_constraints<N,L,M>& rhs ) {
+  CoKriging_constraints( const Self& rhs ) {
     if( rhs.impl_ == 0 )
       impl_ = 0;
     else
@@ -63,7 +69,7 @@ class CoKriging_constraints {
 
   ~CoKriging_constraints() { delete impl_; }
 
-  CoKriging_constraints<N,L,M>& operator = ( const CoKriging_constraints<N,L,M>& rhs ) {
+  Self& operator = ( const Self& rhs ) {
     if( rhs.impl_ == impl_ ) return *this;
     delete impl_;
     if( rhs.impl_ )    
@@ -81,6 +87,13 @@ class CoKriging_constraints {
 				  InputIterator last_neigh
 				  ) const {
     return (*impl_)( A,b,center, first_neigh, last_neigh );
+  }
+
+
+  inline double kriging_variance_contrib( const Location_& center,
+                                          Iterator_ weights_begin,
+                                          Iterator_ weights_end ) const {
+    return impl_->kriging_variance_contrib( center, weights_begin, weights_end );
   }
 
 
@@ -107,13 +120,17 @@ class CoKriging_constraints {
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class CoKriging_constraints_impl {
  private:
  typedef InputIterator N;
  typedef Location_ L;
+ typedef WeightsVector W;
  typedef MatrixLibrary M;
+ typedef typename WeightsVector::iterator Iterator_;
+ typedef CoKriging_constraints_impl<N,L,W,M> Self;
 
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
@@ -123,7 +140,7 @@ class CoKriging_constraints_impl {
  public:
   virtual ~CoKriging_constraints_impl() {}
   
-  virtual CoKriging_constraints_impl<N,L,M>* clone() const = 0;
+  virtual Self* clone() const = 0;
 
   virtual unsigned int operator () (
 				    SymMatrix& A,
@@ -132,6 +149,11 @@ class CoKriging_constraints_impl {
 				    InputIterator first_neigh,
 				    InputIterator last_neigh
 				    ) const = 0;
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const =0;
+
 };
 
 
@@ -146,24 +168,26 @@ class CoKriging_constraints_impl {
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class Co_SKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
-							   Location_,
+							   Location_, WeightsVector,
 							   MatrixLibrary> {
  private:
   typedef InputIterator N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary M;
-  typedef CoKriging_constraints_impl<N,L,M> BaseClass;
+  typedef CoKriging_constraints_impl<N,L,W,M> BaseClass;
   
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
   typedef typename MatrixLib::Symmetric_matrix SymMatrix;
   typedef typename MatrixLib::Vector Vector;
  
-  virtual CoKriging_constraints_impl<N,L,M>* clone() const {
-    return new Co_SKConstraints_impl<N,L,M>;
+  virtual BaseClass* clone() const {
+    return new Co_SKConstraints_impl<N,L,W,M>;
   }
 
 
@@ -179,6 +203,13 @@ class Co_SKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
     return constraints( A,b, center, 
 			first_neigh, last_neigh );
   }
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const {
+    return 0.0;
+  }
+
 };
 
 
@@ -190,25 +221,27 @@ class Co_SKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
 template <
           class InputIterator,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class Co_OKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
-							   Location_,
+							   Location_, WeightsVector,
 							   MatrixLibrary> {
 
  private:
   typedef InputIterator N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary M;
-  typedef CoKriging_constraints_impl<N,L,M> BaseClass;
+  typedef CoKriging_constraints_impl<N,L,W,M> BaseClass;
   
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
   typedef typename MatrixLib::Symmetric_matrix SymMatrix;
   typedef typename MatrixLib::Vector Vector;
  
-  virtual CoKriging_constraints_impl<N,L,M>* clone() const {
-    return new Co_OKConstraints_impl<N,L,M>;
+  virtual BaseClass* clone() const {
+    return new Co_OKConstraints_impl<N,L,W,M>;
   }
 
 
@@ -223,6 +256,13 @@ class Co_OKConstraints_impl : public CoKriging_constraints_impl<InputIterator,
     return constraints( A,b, center, 
 			first_neigh, last_neigh );
   }
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const {
+    return *weights_begin;
+  }
+
 };
 
 

@@ -300,13 +300,41 @@ int solve_kriging_system(typename matrix_lib_traits<matrix_lib>::Matrix& A,
 
 
 /** Computes the kriging variance
- * @param weights is the vector of kriging weights
+ * @param [weights_begin, weights_end) is a range of kriging weights, which
+ * includes the Lagrange parameters.
+ * @param lagrange_begin is an iterator in [weights_begin, weights_end) that
+ * indicates the first Lagrange parameter. 
  * @param b is the second member of the kriging system
  * The requirements on template argument Vector are: 
- *   - vec.begin() and vec.end() are valid expressions that 
- *   - return iterators to the begining and end of the Vector
+ *   - vec.begin() is a  valid expressions that 
+ *     returns an iterators to the begining of the Vector
+ * @param kconstraints are the kriging constraints
+ * @param center is the location being krigged.
  * @param C0 is the auto-covariance C(0) 
  */
+template<
+         class Vector,
+         class InputIterator,
+         class KrigingConstraints,
+         class Location_
+        >
+double compute_kriging_variance(
+				InputIterator weights_begin,
+                                InputIterator lagrange_begin, 
+                                InputIterator weights_end,
+				Vector& b,
+                                KrigingConstraints& kconstraints,
+                                const Location_& center,
+				double C0
+				) {
+  double contrib = 
+    kconstraints.kriging_variance_contrib( center, lagrange_begin, weights_end );
+  double inner_product = std::inner_product(weights_begin, lagrange_begin,
+                                            b.begin(), contrib );
+  return C0 - inner_product;
+};
+
+/*
 template<
          class Vector,
          class InputIterator
@@ -322,7 +350,7 @@ double compute_kriging_variance(
 					    0.0 );
   return C0 - inner_product;
 };
-
+*/
 
 
 #endif

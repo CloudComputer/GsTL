@@ -14,6 +14,7 @@
 template <
           class Neighborhood_,
           class Location_,
+          class WeightsVector,
           class MatrixLibrary
          >
 class Kriging_constraints_impl;
@@ -27,6 +28,7 @@ class Kriging_constraints_impl;
 template <
           class Neighborhood_,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class Kriging_constraints {
@@ -34,8 +36,11 @@ class Kriging_constraints {
   typedef Neighborhood_ N;
   typedef Location_ L;
   typedef MatrixLibrary M;
-  typedef Kriging_constraints_impl<N,L,M> BaseClass;
-    
+  typedef WeightsVector W;
+  typedef Kriging_constraints_impl<N,L,W,M> BaseClass;
+  typedef Kriging_constraints<N,L,W,M> Self;
+  typedef typename WeightsVector::iterator Iterator_;
+  
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
   typedef typename MatrixLib::Symmetric_matrix SymMatrix;
@@ -50,7 +55,7 @@ class Kriging_constraints {
       impl_ = 0;
   }
 
-  Kriging_constraints( const Kriging_constraints<N,L,M>& rhs ) {
+  Kriging_constraints( const Self& rhs ) {
     if( rhs.impl_ )
       impl_ = rhs.impl_->clone();
     else
@@ -60,7 +65,7 @@ class Kriging_constraints {
 
   ~Kriging_constraints() { delete impl_; }
 
-  Kriging_constraints<N,L,M>& operator = ( const Kriging_constraints<N,L,M>& rhs ) {
+  Self& operator = ( const Self& rhs ) {
     if( impl_ == rhs.impl_ ) return *this;
     delete impl_;
     if( rhs.impl_ == 0 ) 
@@ -79,6 +84,13 @@ class Kriging_constraints {
     return (*impl_)( A,b,center, neighbors );
   }
 
+
+  inline double kriging_variance_contrib( const Location_& center,
+                                          Iterator_ weights_begin,
+                                          Iterator_ weights_end ) const {
+    return impl_->kriging_variance_contrib( center, weights_begin, weights_end );
+  }
+                                           
 
  private:
   BaseClass* impl_;
@@ -105,13 +117,17 @@ class Kriging_constraints {
 template <
           class Neighborhood_,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class Kriging_constraints_impl {
  private:
  typedef Neighborhood_ N;
  typedef Location_ L;
+ typedef WeightsVector W;
  typedef MatrixLibrary M;
+ typedef Kriging_constraints_impl<N,L,W,M> Self;
+ typedef WeightsVector::iterator Iterator_;
 
  public:
   typedef matrix_lib_traits<MatrixLibrary> MatrixLib;
@@ -121,7 +137,7 @@ class Kriging_constraints_impl {
  public:
   virtual ~Kriging_constraints_impl() {}
   
-  virtual Kriging_constraints_impl<N,L,M>* clone() const = 0;
+  virtual Self* clone() const = 0;
 
   virtual unsigned int operator () (
 				    SymMatrix& A,
@@ -129,6 +145,10 @@ class Kriging_constraints_impl {
 				    const Location_& center,
 				    const Neighborhood_& neighbors
 				    ) const = 0;
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const =0;
 };
 
 
@@ -141,23 +161,25 @@ class Kriging_constraints_impl {
 template <
           class Neighborhood_,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class SKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
-							   Location_,
+							   Location_, WeightsVector,
 							   MatrixLibrary> {
  private:
   typedef Neighborhood_ N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary M;
-  typedef Kriging_constraints_impl<N,L,M> BaseClass;
+  typedef Kriging_constraints_impl<N,L,W,M> BaseClass;
   
  public:
   typedef typename BaseClass::SymMatrix SymMatrix;
   typedef typename BaseClass::Vector Vector;
  
-  virtual Kriging_constraints_impl<N,L,M>* clone() const {
-    return new SKConstraints_impl<N,L,M>;
+  virtual BaseClass* clone() const {
+    return new SKConstraints_impl<N,L,W,M>;
   }
 
 
@@ -171,6 +193,12 @@ class SKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
     SK_constraints constraints;				      
     return constraints( A,b, center, neighbors );
   }
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const {
+    return 0.0;
+  }
 };
 
 
@@ -182,24 +210,26 @@ class SKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
 template <
           class Neighborhood_,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class OKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
-							   Location_,
+							   Location_, WeightsVector,
 							   MatrixLibrary> {
 
  private:
   typedef Neighborhood_ N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary M;
-  typedef Kriging_constraints_impl<N,L,M> BaseClass;
+  typedef Kriging_constraints_impl<N,L,W,M> BaseClass;
   
  public:
   typedef typename BaseClass::SymMatrix SymMatrix;
   typedef typename BaseClass::Vector Vector;
  
-  virtual Kriging_constraints_impl<N,L,M>* clone() const {
-    return new OKConstraints_impl<N,L,M>;
+  virtual BaseClass* clone() const {
+    return new OKConstraints_impl<N,L,W,M>;
   }
 
 
@@ -211,6 +241,12 @@ class OKConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
 				    ) const {
     OK_constraints constraints;
     return constraints( A,b, center, neighbors );
+  }
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const {
+    return *weights_begin;
   }
 };
 
@@ -226,18 +262,20 @@ template <
           class MeanFunctor,
           class Neighborhood_,
           class Location_,
+          class WeightsVector=std::vector<double>,
           class MatrixLibrary=GSTL_TNT_lib
          >
 class KTConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
-							   Location_,
+							   Location_, WeightsVector,
 							   MatrixLibrary> {
 
  private:
   typedef MeanFunctor MF;
   typedef Neighborhood_ N;
   typedef Location_ L;
+  typedef WeightsVector W;
   typedef MatrixLibrary ML;
-  typedef Kriging_constraints_impl<N,L,ML> BaseClass;
+  typedef Kriging_constraints_impl<N,L,W,ML> BaseClass;
 
 
  public:
@@ -251,8 +289,8 @@ class KTConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
       constraints_( mean_functions_.begin(), mean_functions_.end() ) { 
   }
 
-  virtual Kriging_constraints_impl<N,L,ML>* clone() const {
-    return new KTConstraints_impl<MF,N,L,ML>( mean_functions_ );
+  virtual BaseClass* clone() const {
+    return new KTConstraints_impl<MF,N,L,W,ML>( mean_functions_ );
   }
 
 
@@ -263,6 +301,12 @@ class KTConstraints_impl : public Kriging_constraints_impl<Neighborhood_,
 				    const Neighborhood_& neighbors
 				    ) const {
     return constraints_( A,b, center, neighbors ); 
+  }
+
+  virtual double kriging_variance_contrib( const Location_& center,
+                                           Iterator_ weights_begin,
+                                           Iterator_ weights_end ) const {
+    return constraints_.kriging_variance_contrib( center, weights_begin, weights_end );
   }
   
  protected:

@@ -55,7 +55,7 @@ class SK_constraints{
    * It is not used by the SK engine.
    * @param [first_neigh,last_neigh) is a range of Neighborhoods of Location
    * \a center, one neighborhood for each variable used in the cokriging system.
-   * @return the final size of the kriging system
+   * @return the total number of conditioning data
    */ 
   template <
             class InputIterator,
@@ -90,6 +90,18 @@ class SK_constraints{
     return this->operator()( A,b,center, &neighbors, &neighbors+1 );
   }
     
+
+  /** Compute the contribution to the kriging variance of the Lagrange
+   * parameters.
+   * \c center is the location for which the kriging system is solved,
+   * [begin_weights,end_weights) is a range of lagrange weights.
+  */
+  template< class Location_, class InputIterator >
+  double kriging_variance_contrib( const Location_& center,
+                                   InputIterator begin_weights, 
+                                   InputIterator end_weights ) const {
+    return 0.0;
+  }
 
 }; // end of class SK_constraints 
 
