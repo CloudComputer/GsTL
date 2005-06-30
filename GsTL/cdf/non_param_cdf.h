@@ -38,6 +38,7 @@
 #include <GsTL/cdf/cdf_basics.h>
 #include <GsTL/cdf/interpolators.h>
 #include <GsTL/utils/gstl_error_messages.h>
+#include <GsTL/univariate_stats/build_cdf.h>
 
 #include <vector>
 #include <algorithm>
