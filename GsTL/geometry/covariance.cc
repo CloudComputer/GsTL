@@ -37,7 +37,8 @@
 
 template<class Location>
 typename Spherical_covariance<Location>::result_type 
-Spherical_covariance<Location>::compute(const Spherical_covariance<Location>::EuclideanVector& vec) const{
+Spherical_covariance<Location>::
+compute(const typename Spherical_covariance<Location>::EuclideanVector& vec) const{
   double h=euclidean_norm(vec);
 
   if( h >= this->a_ ) 
@@ -190,7 +191,7 @@ set_geometry(double R1, double R2, double alpha) {
 template<class Location>
 typename Anisotropic_covariance_2d<Location>::result_type 
 Anisotropic_covariance_2d<Location>::
-compute(const Anisotropic_covariance_2d<Location>::EuclideanVector& vec) const{
+compute(const typename Anisotropic_covariance_2d<Location>::EuclideanVector& vec) const{
   
   return covar_->isotrop_compute( transform_(vec) );
 }
@@ -323,7 +324,7 @@ set_geometry(double R1, double R2, double R3,
 template<class Location>
 typename Anisotropic_covariance_3d<Location>::result_type 
 Anisotropic_covariance_3d<Location>::
-compute(const Anisotropic_covariance_3d<Location>::EuclideanVector& vec) const{
+compute(const typename Anisotropic_covariance_3d<Location>::EuclideanVector& vec) const{
   return covar_->isotrop_compute( transform_(vec) );
 }
 
