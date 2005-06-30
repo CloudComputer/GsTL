@@ -28,7 +28,18 @@ class pool_allocator{
   
   pool_allocator(int training_image_size, int template_size, int nb_of_categories);
   
-  category_type_iterator new_pdf(int nb_of_categories);
+  //category_type_iterator new_pdf(int nb_of_categories);
+  category_type_iterator new_pdf(int nb_of_categories){
+    category_type_iterator new_element_position = pdf_pool_.push_back(0);
+
+    for(int i=1; i<nb_of_categories ; i++)
+      pdf_pool_.push_back(0);
+
+    return new_element_position;
+  }
+
+
+
   treenode_ptr_iterator new_node_ptr(int nb_of_categories);
   treenode_iterator new_node(int nb_of_categories);
   
@@ -58,7 +69,7 @@ class pool_allocator{
 
 
 
-
+/*
 template<class T>
 inline typename pool_allocator<T>::category_type_iterator 
 pool_allocator<T>::new_pdf(int nb_of_categories){
@@ -70,7 +81,7 @@ pool_allocator<T>::new_pdf(int nb_of_categories){
 
   return new_element_position;
 }
-
+*/
 
 
 template<class T>
