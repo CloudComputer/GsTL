@@ -46,7 +46,7 @@ class SmartPtr : public RefManagePolicy {
 
   void operator=(const SmartPtr<T,RefManagePolicy>& smart_ptr);
 
-  int peer(const SmartPtr<T,RefManagePolicy>& smart_ptr) const {
+  bool peer(const SmartPtr<T,RefManagePolicy>& smart_ptr) const {
     return (raw_ptr_ == smart_ptr.raw_ptr_);
   }
   

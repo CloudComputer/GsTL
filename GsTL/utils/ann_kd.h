@@ -44,9 +44,9 @@
 
 #include <stdlib.h>                     // standard libs
 #include <stdio.h>                      // standard I/O (for NULL)
-#include <iostream.h>                   // I/O streams
-#include <math.h>                       // math includes
-#include <iomanip.h>                    // I/O manipulators
+#include <iostream>                   // I/O streams
+#include <cmath>                       // math includes
+#include <iomanip>                    // I/O manipulators
 
 #define INFDISTANCE 1e100         //define infinity distance.
 
@@ -81,12 +81,12 @@ enum ANNerr {ANNwarn = 0, ANNabort = 1};
 void annError(char *msg, ANNerr level)
 {
     if (level == ANNabort) {
-        cerr << "ANN: ERROR------->" << msg 
+        std::cerr << "ANN: ERROR------->" << msg 
                 << "<-------------ERROR\n";
         exit(1);
     }
     else {
-        cerr << "ANN: WARNING----->" << msg 
+        std::cerr << "ANN: WARNING----->" << msg 
                 << "<-------------WARNING\n";
     }
 }
