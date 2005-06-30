@@ -34,11 +34,10 @@ public:
 
 
 
-  template< class InputIterator, class NonParametricCdf >
-  int operator () ( const typename std::iterator_traits<InputIterator>::value_type::value_type& u,
+  template< class GeoValue, class InputIterator, class NonParametricCdf >
+  int operator () ( const GeoValue& u, //const typename std::iterator_traits<InputIterator>::value_type::value_type& u,
                     InputIterator first_neigh, InputIterator last_neigh,
                     NonParametricCdf& ccdf ) const {
-
 
     weights_.clear();
 
