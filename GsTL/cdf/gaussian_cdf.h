@@ -41,7 +41,7 @@
 
 
 
-class Gaussian_cdf : public Cdf<double> {
+class Gaussian_cdf : public Cdf<float> {
 
  public:
 
@@ -52,11 +52,15 @@ class Gaussian_cdf : public Cdf<double> {
                                                               var_(var){}
   virtual ~Gaussian_cdf() {}
 
-  double& mean() {return mean_;}
-  const double& mean() const {return mean_;}
+  float& mean() {return mean_;}
+  const float& mean() const {return mean_;}
 
-  double& variance() {return var_;}
-  const double& variance() const {return var_;}
+  float& variance() {return var_;}
+  const float& variance() const {return var_;}
+
+  // Added Oct 2005.  Set up the mean and the variance
+ // void mean( value_type mean ) { mean_ = mean;}
+ // void variance( value_type var ) { var_ = var;}
 
 
   /** Computes zk such that P(Z<z) = p.
@@ -150,6 +154,7 @@ inline double Gaussian_cdf::prob(value_type z) const {
 
   return P;
 };
+
 
 
 

@@ -58,21 +58,21 @@ class Non_parametric_cdf : public Cdf<T> {
 
   value_type mean( void )
   {
-	  double inc_p = 0.005;
+	  double inc_p = 0.0001;
 	  double mean = 0.;
 
-	  for(double pp = 0.02; pp<0.98; pp+=inc_p )
+	  for(double pp = 0.0001; pp<0.9999; pp+=inc_p )
 		  mean += inverse( pp )*inc_p;
 	  return  mean;
   }
   value_type variance( void ) const
   {
-	  double inc_p = 0.005;
+	  double inc_p = 0.0001;
 	  double s1 = 0.;
 	  double s2 = 0.;
 	  double inv_p;
 
-	  for(double pp = 0.02; pp<0.98; pp+=inc_p ){
+	  for(double pp = 0.0001; pp<0.9999; pp+=inc_p ){
 		  inv_p = inverse( pp );
 		  s1 += inv_p*inc_p;
 		  s2 += inv_p*inv_p*inc_p;
@@ -86,7 +86,6 @@ class Non_parametric_cdf : public Cdf<T> {
 */
 	return s2 - s1*s1;
   }
-
 
  protected:
   std::vector<value_type>  z_values_;

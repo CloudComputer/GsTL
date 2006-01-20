@@ -130,10 +130,12 @@ public:
  
   template<class ForwardIterator>
   inline void p_set(ForwardIterator p_begin, ForwardIterator p_end);
+
  
   virtual bool make_valid() { return make_cdf_valid( *this); } 
   virtual double prob(value_type z) const ;
   virtual value_type inverse(double p) const ;
+
 
 private:
   
@@ -256,6 +258,7 @@ inverse(double p) const {
 
   return result;
 }
+
 
 
 #endif
