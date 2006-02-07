@@ -100,6 +100,15 @@ square_euclidean_norm(const EuclideanVector& v){
   return sq_norm;
 }
 
+template<class EuclideanVector>
+inline double
+inner_product( const EuclideanVector& v1, const EuclideanVector& v2 ){
+  double res=0.0;
+  for(int i=0; i<EuclideanVector::dimension ; i++)
+    res += v1[i]*v2[i];
+
+  return res;
+}
 
 
 /** This functor performs an anisotropic transformation, ie a rotation
