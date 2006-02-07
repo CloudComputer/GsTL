@@ -82,13 +82,13 @@ typename Gaussian_covariance<Location>::result_type
 Gaussian_covariance<Location>::compute(const typename Gaussian_covariance<Location>::
 				             EuclideanVector& vec) const{
   double h=euclidean_norm(vec);
-  return this->c_ * exp( -pow(3*h/this->a_ ,2) );
+  return this->c_ * exp( -3*pow(h/this->a_ ,2) );
 }
 
 template<class Location>
 typename Gaussian_covariance<Location>::result_type 
 Gaussian_covariance<Location>::isotrop_compute(double h) const{
-  return this->c_ * exp( -pow(3*h/this->a_ ,2) );
+  return this->c_ * exp( -3*pow(h/this->a_ ,2) );
 }
 
 
