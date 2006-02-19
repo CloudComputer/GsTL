@@ -36,6 +36,7 @@
 #include <functional>
 #include <vector>
 
+using namespace std;
 
 /** A servo system sampler draws realizations from a cdf so that the cdf of all the 
  * values drawn by the servo system is close to a target cdf.
@@ -95,6 +96,14 @@ class Servo_system_sampler {
   template<class GeoValue, class CategNonParamCdf>
   int operator()(GeoValue& gval, const CategNonParamCdf& ccdf); 
   
+    /*
+     * function to unsign simulated value at some locations
+     */
+    void removeSimulatedNode( GsTLGridProperty* prop, vector<int>& grid_path );
+    void removeSimulatedNode( RGrid* grid, GsTLGridProperty* prop, vector<int>& grid_path );
+
+    // for testing purpose only
+    void print();
 
  private:
 

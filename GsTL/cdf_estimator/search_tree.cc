@@ -289,7 +289,13 @@ int search_tree<T,allocator>::operator()(const Geovalue_& ,
   */
 
   //return max_level;
-  return 0;
+  //return 0;
+
+  // return the number of nodes droped
+  if ( neighbors.size() - max_level < 0 )
+      return 0;
+  else
+      return  ( neighbors.size() - max_level );
 }
   
 

@@ -149,6 +149,9 @@ operator () ( GeoValue& gval, const CategNonParamCdf& ccdf ) {
 	  realization < static_cast<int>(current_histogram_.size()) );
   current_histogram_[ realization ] ++;
   
+  // for testing only
+  //cout << "simulated node location " << gval.node_id() << endl;
+  //print();
 
   return 0;
 }
@@ -232,6 +235,53 @@ operator()(GeoValue& gval, const CategNonParamCdf2& ccdf) {
 
 */
 
+
+template < class RandNumberGenerator >
+void Servo_system_sampler< RandNumberGenerator >::
+removeSimulatedNode( GsTLGridProperty* prop, vector<int>& grid_path )
+{
+    int current_value; 
+
+    for (int i=0; i<grid_path.size(); i++)
+    {
+        current_value = prop->get_value( grid_path[i] );
+        prop->set_not_informed( grid_path[i] );
+
+		current_histogram_[ current_value ] --;
+		nb_of_data_ --;
+    }
+}
+
+
+template < class RandNumberGenerator >
+void Servo_system_sampler< RandNumberGenerator >::
+removeSimulatedNode( RGrid* grid, GsTLGridProperty* prop, vector<int>& grid_path )
+{
+    SGrid_cursor  cursor = SGrid_cursor( *(grid->cursor()) );
+    int current_value; 
+    int node_id;
+
+    for (int i=0; i<grid_path.size(); i++)
+    {
+        node_id = cursor.node_id( grid_path[i] );
+        current_value = prop->get_value( node_id );
+        prop->set_not_informed( node_id );
+
+		current_histogram_[ current_value ] --;
+		nb_of_data_ --;
+    }
+}
+
+// for testing only
+template < class RandNumberGenerator >
+void Servo_system_sampler< RandNumberGenerator >::print()
+{
+    cout << " nb_data = " << nb_of_data_  << ",         prop of facies are:  ";
+    for (int i=0; i<nb_of_categories_; i++)
+        cout << current_histogram_[i] << " , ";
+
+    cout << endl;
+}
 #include <GsTL/sampler/servo_system.h>
 
 

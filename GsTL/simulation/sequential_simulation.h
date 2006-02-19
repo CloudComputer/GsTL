@@ -25,6 +25,8 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ * modified by Jianbing Wu, Feb. 2006 @ Stanford University
  */
 
  
@@ -69,7 +71,7 @@ sequential_simulation(
 		      Cdf& ccdf,
 		      CdfEstimator& estim,
 		      const MarginalCdf& marginal,
-		      Sampler samp
+		      Sampler& samp
 		      ) {
   int ok = 0;
 
@@ -143,7 +145,7 @@ sequential_simulation(
 		      Cdf& ccdf,
 		      CdfEstimator& estim,
 		      const MarginalCdf& marginal,
-		      Sampler samp,
+		      Sampler& samp,
 		      Notifier* notifier
 		      ) {
 
@@ -261,6 +263,130 @@ sequential_simulation_2(
   return ok;
 }
 
+
+/*
+ * record the number of nodes dropped during simulation 
+ */
+template
+<
+  class GeovalueIterator,
+  class Neighborhood,
+  class Cdf,
+  class CdfEstimator,
+  class MarginalCdf,
+  class Sampler,
+  class DropNodes
+>
+inline int 
+sequential_simulation(
+		      GeovalueIterator begin, GeovalueIterator end,
+		      Neighborhood& neighbors,
+		      Cdf& ccdf,
+		      CdfEstimator& estim,
+		      const MarginalCdf& marginal,
+		      Sampler& samp,
+              DropNodes& drop
+		      ) {
+  int ok = 0;
+  int loc = 0;
+  int nodes_dropped;
+
+  for(; begin != end; begin++, loc++) {
+    if( begin->is_informed() ) continue;
+    
+    neighbors.find_neighbors( *begin );
+    
+    DEBUG_PRINT_LOCATION( "center", begin->location() );
+
+    if( neighbors.is_empty() ){
+      //if we don't have any conditioning data, we simply draw from the
+      // marginal
+      WRITE_TO_DEBUG_STREAM( "drawing from marginal" << std::endl );
+      samp(*begin, marginal);
+    }
+    else {
+      DEBUG_PRINT_NEIGHBORHOOD( "neighbors", &neighbors );
+
+      int status = estim( *begin, neighbors, ccdf, nodes_dropped);	//get ccdf from the search trees
+      drop( loc, nodes_dropped );
+
+      if(status == 0) {
+      	samp(*begin, ccdf);
+      }
+      else {
+      	// the ccdf could not be estimated. Draw from the marginal
+	      samp(*begin, marginal);
+	      ok++;
+      }
+    }
+  }
+
+  return ok;
+}
+
+
+template
+<
+  class GeovalueIterator,
+  class Neighborhood,
+  class Cdf,
+  class CdfEstimator,
+  class MarginalCdf,
+  class Sampler,
+  class Notifier,
+  class DropNodes
+>
+inline int 
+sequential_simulation(
+		      GeovalueIterator begin, GeovalueIterator end,
+		      Neighborhood& neighbors,
+		      Cdf& ccdf,
+		      CdfEstimator& estim,
+		      const MarginalCdf& marginal,
+		      Sampler& samp,
+		      Notifier* notifier,
+              DropNodes& drop
+		      ) {
+
+  int bad = 0;
+  int loc = 0;
+  int nodes_dropped;
+
+  for(; begin != end; begin++, loc++) {
+    if( begin->is_informed() ) continue;
+      
+    neighbors.find_neighbors( *begin );
+
+    DEBUG_PRINT_LOCATION( "center", begin->location() );
+
+    if( neighbors.is_empty() ){
+      //if we don't have any conditioning data, we simply draw from the
+      // marginal
+      WRITE_TO_DEBUG_STREAM( "drawing from marginal" << std::endl );
+      samp(*begin, marginal);
+    }
+    else {
+      DEBUG_PRINT_NEIGHBORHOOD( "neighbors", &neighbors );
+
+      int status = estim( *begin, neighbors, ccdf, nodes_dropped);	//get ccdf from the search trees
+      drop( loc, nodes_dropped );
+
+      if(status == 0) {
+	      samp(*begin, ccdf);
+      }
+      else {
+      	// the ccdf could not be estimated. Draw from the marginal
+        WRITE_TO_DEBUG_STREAM( "Can't estimate ccdf. drawing from marginal\n" );
+      	samp(*begin, marginal);
+      	bad++;
+      }
+    }
+
+    if( !notifier->notify() ) return -1;
+  }
+
+  return bad;
+}
 
 
 
