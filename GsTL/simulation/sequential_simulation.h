@@ -302,7 +302,8 @@ sequential_simulation(
       //if we don't have any conditioning data, we simply draw from the
       // marginal
       WRITE_TO_DEBUG_STREAM( "drawing from marginal" << std::endl );
-      samp(*begin, marginal);
+      samp(*begin, marginal);  
+      //drop( loc, neighbors.max_size() );
     }
     else {
       DEBUG_PRINT_NEIGHBORHOOD( "neighbors", &neighbors );
@@ -364,6 +365,7 @@ sequential_simulation(
       // marginal
       WRITE_TO_DEBUG_STREAM( "drawing from marginal" << std::endl );
       samp(*begin, marginal);
+      //drop( loc, neighbors.max_size() );
     }
     else {
       DEBUG_PRINT_NEIGHBORHOOD( "neighbors", &neighbors );
