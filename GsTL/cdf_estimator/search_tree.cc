@@ -16,16 +16,21 @@ search_tree<T, allocator>::search_tree(forward_iterator first, forward_iterator 
   
   /** build the search tree from the information in range [first,last)
    */
+
   for(forward_iterator it=first; it!=last; ++it)
-    {
+  {
+      if ( !( it->is_informed() ) )    continue;
+
       T current_category = static_cast<T>( it->property_value() );
       gstl_assert(current_category>=0 && current_category< nb_of_categories_);
       root_->pdf(current_category)++;
 
       // find the neighbors of current location
       neighbors.find_neighbors( *it );
+
+      //if (neighbors.size() == neighbors.max_size() )
       update(root_, current_category, neighbors, neighbors.begin() );
-    }
+  }
 }
 
 
