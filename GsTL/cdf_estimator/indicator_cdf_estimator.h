@@ -167,7 +167,8 @@ class Indicator_cdf_estimator{
 
 
 
- private:
+ //private:
+ protected :
 
   typedef typename std::iterator_traits<InputIterator>::value_type Covariance;
   typedef typename std::vector<Covariance>::const_iterator Covariance_iterator;
