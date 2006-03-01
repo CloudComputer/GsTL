@@ -352,22 +352,19 @@ operator()(
     int ind = 0;
     double prob = 0;
     double weights_sum = 0;
-    WRITE_TO_DEBUG_STREAM("node_id : "<<u.node_id()<<" simul_grid : "<<u.property_array()<<std::endl);
     for(const_iterator neigh_it = first_neigh->begin(); 
       	 neigh_it != first_neigh->end() ; ++neigh_it, ++ind ) {
       gstl_assert( ind < (int)weights_.size() );
+
       //Check if the data is either on the simulation grid or on the hardata grid
       if( u.property_array() == neigh_it->property_array() || 
         neigh_it->property_array() == hd_property_) {
- //         std::cout<<"simul or hd; node_id : "<<neigh_it->property_value()<<" grid : "<<neigh_it->property_array()<<std::endl;
-        WRITE_TO_DEBUG_STREAM("simul; value : "<<neigh_it->property_value()<<" grid : "<<neigh_it->property_array()<<std::endl);
         prob +=
       	  double(indicator_( neigh_it->property_value(), *z_it )) * weights_[ind];
         weights_sum += weights_[ind];
       }
       // The data is already coded
       else {
-       WRITE_TO_DEBUG_STREAM("coded; value : "<<neigh_it->property_value()<<" grid : "<<neigh_it->property_array()<<std::endl);
         prob += neigh_it->property_value() * weights_[ind];
         weights_sum += weights_[ind];
       }
