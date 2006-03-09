@@ -15,7 +15,7 @@ template <class BinaryFunction, class Sampler_>
 class Updater_sampler {
 public:
   Updater_sampler( BinaryFunction local_cdf_updater,
-                   Sampler_ sampler )  
+                   Sampler_& sampler )  
     : local_cdf_updater_( local_cdf_updater ),
       sampler_( sampler ) {
   }
