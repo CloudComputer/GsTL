@@ -12,7 +12,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: linear_congruential.hpp,v 1.1 2003/11/24 05:48:28 nremy Exp $
+ * $Id: linear_congruential.hpp,v 2.0 2006/05/02 16:05:11 nico97492 Exp $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
