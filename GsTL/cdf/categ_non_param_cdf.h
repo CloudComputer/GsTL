@@ -90,6 +90,8 @@ class Categ_non_param_cdf : public Non_parametric_cdf<T> {
   };
 
 
+  ~Categ_non_param_cdf() {}
+
   //-----------------
   inline void z_set( unsigned int categories_count );
  

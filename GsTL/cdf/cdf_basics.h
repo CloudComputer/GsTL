@@ -17,7 +17,6 @@ class Cdf {
   typedef T value_type;
   virtual value_type inverse(double p) const = 0;
   virtual double prob(value_type z) const = 0;
-
 };
 
 
@@ -33,6 +32,7 @@ class Non_parametric_cdf : public Cdf<T> {
  public:
   static const double NaN;
 
+  Non_parametric_cdf() {}
   virtual ~Non_parametric_cdf() {}
 
   virtual bool make_valid() = 0; 
@@ -42,6 +42,8 @@ class Non_parametric_cdf : public Cdf<T> {
     p_values_.resize(m);
   }
   
+  virtual value_type inverse(double p) const = 0;
+
   virtual int size() const { return z_values_.size(); }
 
   inline z_iterator z_begin() {return z_values_.begin();}

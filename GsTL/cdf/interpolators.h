@@ -105,6 +105,7 @@ struct Linear_interpol {
 
 class Tail_interpolator_impl {
 public:
+  virtual ~Tail_interpolator_impl() {}
   virtual Tail_interpolator_impl* clone() const = 0;
   virtual double z( double z1, double p1, double p ) const = 0;
   virtual double p( double z1, double p1, double z ) const = 0;

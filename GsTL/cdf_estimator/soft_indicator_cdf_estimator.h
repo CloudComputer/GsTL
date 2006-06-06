@@ -84,6 +84,8 @@ template
 class Soft_indicator_cdf_estimator 
   : public Indicator_cdf_estimator<InputIterator,BinaryPredicate,MatrixLibrary> {
   
+  typedef Indicator_cdf_estimator<InputIterator,BinaryPredicate,MatrixLibrary> Parent_;
+
   public:
   
   template< class InputIterator2 >
@@ -114,7 +116,7 @@ class Soft_indicator_cdf_estimator
 		
   
   Soft_indicator_cdf_estimator(const Soft_indicator_cdf_estimator& rhs) 
-    : Indicator_cdf_estimator(dynamic_cast<Indicator_cdf_estimator>(rhs)) {}
+    : Parent_(dynamic_cast<Parent_>(rhs)) {}
 
 /*
   Soft_indicator_cdf_estimator& operator=(const Indicator_cdf_estimator& rhs) {
@@ -123,7 +125,7 @@ class Soft_indicator_cdf_estimator
     marginal_probas_ = rhs.marginal_probas_ ;
     weights_.reserve(rhs.weights_.size());
   }
-/*  
+*/  
   /** Two definitions of operator() are provided. One implements a Single Variable
    * Cdf Estimator, the second one implements a Multiple Variables Cdf Estimator.
    */
@@ -223,9 +225,9 @@ operator()(
 
   // Find the kriging weights, using the first covariance function (if other
   // covariances were supplied, they are ignored).
-  int status = kriging_weights<MatrixLibrary>( weights_,
+  int status = kriging_weights<MatrixLibrary>( Parent_::weights_,
 					       u.location(), neighbors,
-					       covariances_[0], Kconstraints );
+					       Parent_::covariances_[0], Kconstraints );
   if( status != 0 ) return status;
 
   // Loop on all the thresholds and compute the corresponding probability
@@ -245,20 +247,20 @@ operator()(
     double weight_sum = 0;
     for(const_iterator neigh_it = neighbors.begin(); 
 	    neigh_it != neighbors.end() ; ++neigh_it, ++ind ) {
-      gstl_assert( ind < (int)weights_.size() );
+      gstl_assert( ind < (int)Parent_::weights_.size() );
       // check if the geovalue is already coded
       if( u.property_array() == neigh_it->property_array() || 
         neigh_it->property_array() == hd_property_ ) {
         prob +=
-      	  double(indicator_( neigh_it->property_value(), *z_it )) * weights_[ind];
-        weight_sum += weights_[ind];
+      	  double(indicator_( neigh_it->property_value(), *z_it )) * Parent_::weights_[ind];
+        weight_sum += Parent_::weights_[ind];
       }
       else {  // The data is already coded
-        prob += neigh_it->property_value() * weights_[ind];
-        weight_sum += weights_[ind];
+        prob += neigh_it->property_value() * Parent_::weights_[ind];
+        weight_sum += Parent_::weights_[ind];
       }
     }
-    *p_it = prob + (1.0 - weight_sum)*marginal_probas_[ithresh];
+    *p_it = prob + (1.0 - weight_sum)* Parent_::marginal_probas_[ithresh];
   }
 
   // Now ccdf has been estimated, correct order relation poblems
@@ -299,8 +301,8 @@ operator()(
 			  
   SK_constraints Kconstraints;
 
-  Covariance_iterator current_covar = covariances_.begin();
-  Covariance_iterator end_covar = covariances_.end();
+  typename Parent_::Covariance_iterator current_covar = Parent_::covariances_.begin();
+  typename Parent_::Covariance_iterator end_covar = Parent_::covariances_.end();
 
   int current_neigh_id = -1;
   int neighborhoods_nb = std::distance(first_neigh, last_neigh);
@@ -329,13 +331,13 @@ operator()(
         ++first_neigh;
 
       int status = 
-      	kriging_weights<MatrixLibrary>( weights_,
+      	kriging_weights<MatrixLibrary>( Parent_::weights_,
 			                u.location(), *first_neigh,
 					*current_covar, Kconstraints );
       
       // If the kriging system could not be solved, use the marginal
       if(status!=0) {
-      	*p_it = marginal_probas_[ithresh];
+      	*p_it = Parent_::marginal_probas_[ithresh];
         continue;
       }
       
@@ -354,22 +356,22 @@ operator()(
     double weights_sum = 0;
     for(const_iterator neigh_it = first_neigh->begin(); 
       	 neigh_it != first_neigh->end() ; ++neigh_it, ++ind ) {
-      gstl_assert( ind < (int)weights_.size() );
+      gstl_assert( ind < (int) Parent_::weights_.size() );
 
       //Check if the data is either on the simulation grid or on the hardata grid
       if( u.property_array() == neigh_it->property_array() || 
         neigh_it->property_array() == hd_property_) {
         prob +=
-      	  double(indicator_( neigh_it->property_value(), *z_it )) * weights_[ind];
-        weights_sum += weights_[ind];
+      	  double(indicator_( neigh_it->property_value(), *z_it )) * Parent_::weights_[ind];
+        weights_sum += Parent_::weights_[ind];
       }
       // The data is already coded
       else {
-        prob += neigh_it->property_value() * weights_[ind];
-        weights_sum += weights_[ind];
+        prob += neigh_it->property_value() * Parent_::weights_[ind];
+        weights_sum += Parent_::weights_[ind];
       }
     }
-    *p_it = prob + (1 - weights_sum)*marginal_probas_[ithresh];
+    *p_it = prob + (1 - weights_sum)* Parent_::marginal_probas_[ithresh];
 
   }
 
