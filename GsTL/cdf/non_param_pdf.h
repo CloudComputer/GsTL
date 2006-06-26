@@ -156,7 +156,7 @@ template<class T>
 template<class forward_iterator>
 inline void Non_param_pdf<T>::z_set(forward_iterator z_begin, 
 				    forward_iterator z_end) {
-  p_values_.erase();
+  p_values_.clear();
   z_values_.resize(z_end - z_begin);
   p_values_.resize(z_values_.size());
 
