@@ -38,6 +38,9 @@
 
 using namespace std;
 
+class RGrid;
+class GsTLGridProperty;
+
 /** A servo system sampler draws realizations from a cdf so that the cdf of all the 
  * values drawn by the servo system is close to a target cdf.
  * A parameter in [0,1] is used to set how much modification the servo system is 
