@@ -28,7 +28,6 @@ search_tree<T, allocator>::search_tree(forward_iterator first, forward_iterator 
       // find the neighbors of current location
       neighbors.find_neighbors( *it );
 
-      //if (neighbors.size() == neighbors.max_size() )
       update(root_, current_category, neighbors, neighbors.begin() );
   }
 }
@@ -114,8 +113,7 @@ template<class neighborhood>
 void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& result,
 					    treenode_iterator t_node,
 					    neighborhood& neighbors,
-					    typename neighborhood::iterator neigh_it){
-
+					    typename neighborhood::const_iterator neigh_it){
   // if the node is informed
   if( neigh_it->is_informed() ) {
     category_type current_category = category_type( neigh_it->property_value() );
@@ -142,7 +140,7 @@ void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& resu
   // continue the search by assigning to the node any possible value
   else {
     for (int i=0; i<nb_of_categories_ ; i++){
-      typename neighborhood::iterator next_neigh = neigh_it;
+      typename neighborhood::const_iterator next_neigh = neigh_it;
 	  
       //if the branch of the tree actually exists:
       if(t_node->has_child( i, min_replicates_, nb_of_categories_ ) ) {
@@ -160,8 +158,9 @@ void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& resu
     }
   }
 }
+//*/
 
-*/
+/*
 template<class T, class allocator>
 template<class neighborhood>
 void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& result,
@@ -213,17 +212,56 @@ void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& resu
     }
   }
 }
+*/
 
+// modified by JBWu, to account for min_replicates_ input
+template<class T, class allocator>
+template<class neighborhood>
+void search_tree<T,allocator>::get_all_pdfs(std::vector<treenode_iterator>& result,
+					    treenode_iterator t_node,
+					    neighborhood& neighbors,
+					    typename neighborhood::const_iterator neigh_it)
+{
+    result.push_back(t_node);     // record it anyway, in case of dropping nodes
 
+    if( neigh_it->is_informed() )     
+    {    // if the node is informed
+        category_type current_category = category_type( neigh_it->property_value() );
 
+        if( t_node->child(current_category) != 0 )      
+        {   //if the branch of the tree actually exists:
+            if ( ++neigh_it == neighbors.end() )
+            {    // If there are no neighbors left, the search is over
+                treenode_iterator node_ptr = t_node->child(current_category);
+                result.push_back(node_ptr);
+            }
+            else   // recursive call        
+                get_all_pdfs(result, t_node->child(current_category), neighbors, neigh_it);
+        }        
+    }
+    else     // the node is not informed.
+    {        // continue the search by assigning to the node any possible value
+        for (int i=0; i<nb_of_categories_ ; i++)
+        {
+            typename neighborhood::const_iterator next_neigh = neigh_it;
 
+            if(t_node->child(i) != 0) 
+            {        //if the branch of the tree actually exists:
+                if( ++next_neigh == neighbors.end() )       // If there are no neighbors left, the search is over
+                    result.push_back(t_node->child(i));
+                else      // recursive call
+                    get_all_pdfs(result, t_node->child(i), neighbors, next_neigh);
+            }
+        }
+    }
+}
 
 //------------------------------
 // operator ()
 
 template<class T, class allocator>
 template<class Geovalue_, class neighborhood, class non_param_cdf>
-int search_tree<T,allocator>::operator()(const Geovalue_& , 
+int search_tree<T,allocator>::operator()(const Geovalue_& u, 
 					 neighborhood& neighbors,
 					 non_param_cdf& ccdf){
 
@@ -266,6 +304,7 @@ int search_tree<T,allocator>::operator()(const Geovalue_& ,
   // put the pdf into the ccdf 
   double replicates_nb = 0;
 
+  /*
   node_ptr_vector_iterator  vec_it = retrieved_pdfs.begin();
   for( ; vec_it!=retrieved_pdfs.end(); ++vec_it) {
     if( (*vec_it)->level() == max_level) {
@@ -276,6 +315,30 @@ int search_tree<T,allocator>::operator()(const Geovalue_& ,
       }
     }
   }
+  */
+
+  // rewrite to account for different min_replicates input 
+  int current_level = max_level+1;
+
+  while ( replicates_nb<min_replicates_ && current_level>0 )
+  {
+      current_level --;
+      replicates_nb = 0;
+
+      for(node_ptr_vector_iterator  vec_it = retrieved_pdfs.begin(); vec_it!=retrieved_pdfs.end(); ++vec_it) 
+      {
+          if( (*vec_it)->level() == current_level) 
+          {
+              it = ccdf.p_begin();
+              for(int i=0 ; i < nb_of_categories_; ++i, ++it) 
+              {
+                  replicates_nb += (*vec_it)->pdf(i);
+                  *it += (*vec_it)->pdf(i);
+              }
+          }
+      }
+  }
+
   
   // ccdf contains the number of observations for each class.
   // Turn them into proportions
@@ -293,19 +356,30 @@ int search_tree<T,allocator>::operator()(const Geovalue_& ,
   }
   */
 
-  //return max_level;
-  //return 0;
-
   // return the number of nodes droped
-  if ( neighbors.size() - max_level < 0 )
-      return 0;
+
+/*
+  if ( neighbors.size()<current_level )
+  {
+      //GsTLcout << "simulated node id: " << u.node_id() << gstlIO::end;
+      GsTLcout << "neighborhood size: " << neighbors.size() 
+                       << ", neighborhood dist: " << std::distance( neighbors.begin(), neighbors.end() ) 
+                       << ", max level: " << max_level
+                       << ", current level: " << current_level << gstlIO::end;
+      //for (typename neighborhood::const_iterator neigh_it = neighbors.begin(); neigh_it!=neighbors.end(); neigh_it++)
+      //    GsTLcout << "neighborhood id: " << neigh_it->node_id() << gstlIO::end;
+  }
+*/
+  //if ( neighbors.size() < neighbors.max_size()/4 )
+  if ( neighbors.size() < 10 )
+      return -neighbors.size();
+  else if ( current_level<10 )
+      return -current_level;
   else
-      return  ( neighbors.size() - max_level );
+      return std::distance( neighbors.begin(), neighbors.end() ) - current_level;
+      //return max_level - current_level;
 }
   
-
-
-
 
 
 //------------------------------
