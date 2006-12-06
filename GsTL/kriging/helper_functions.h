@@ -198,7 +198,49 @@ int build_Cii(
 }
 
 
+/** This is an overload function of the repvious.  It does not
+ * a covarianceSet, hence not need for var_i
+ * This function builds the diagonal blocks Cii of the kriging matrix.
+ * @param A is a reference to the kriging matrix.
+ * @param start_index is the matrix index at which the block 
+ * should be inserted: if start_index=n, the block will begin at (n,n). 
+ * start_index != 1 for cokriging.
+ */ 
+template <
+          class SymmetricMatrix,
+          class InputIterator,
+          class Covariance
+         >
+int build_Cii(
+	      SymmetricMatrix& A,			 
+	      InputIterator first_neigh, InputIterator last_neigh,
+	      Covariance& covar,
+	      int start_index =1
+	      ) {
+  
+  int i=start_index;
+  int j;
+  
+  // Only compute the upper triangle of the matrix
+  for(InputIterator row = first_neigh ; row != last_neigh ; row++ )
+    {
+      j=i;
+      for(InputIterator col = row ; col != last_neigh ; col++)	  
+	A(i,j++) = covar( row->location(), col->location() );
+      
+      i++;
+    }
+  
+  // After this loop, i=start_index + neighborhood_size + 1
+  // fill in the lower triangle to make the symetric matrix
+  /*
+  for(int m=start_index; m<i-1; m++)
+    for(int n=start_index; n<m; n++)
+      A(m,n)=A(n,m);
+  */
 
+  return 0;
+}
 
 
 
@@ -222,14 +264,14 @@ int build_Cii(
 template<
          class SymmetricMatrix,
          class InputIterator,
-         class CovarianceSet
+         class Covariance
         >
 void build_Cij(
 	       SymmetricMatrix& A,
 	       int start_row, int start_col,
 	       InputIterator first_i, InputIterator last_i,
 	       InputIterator first_j, InputIterator last_j,
-	       CovarianceSet& covar,
+	       Covariance& covar,
 	       int var_i, int var_j
 	       ) {
 
@@ -246,6 +288,43 @@ void build_Cij(
     }
 }
 
+
+
+/** Build_C builds a covariance matrix based on the same caovariance funtion
+ * @param A is the "total" matrix into which block Cij will
+ * be inserted.
+ * @param start_row and start_col are the indices at which the block
+ * will be inserted.
+ * @param first_i is an iterator to the first element of a neighborhood of
+ * nodes informed by variable i.
+ * last_i is an iterator to 1 past the last element of that neighborhood.
+ * @param first_j is an iterator to the first element of a neighborhood of
+ * nodes informed by variable j.
+ */
+template<
+         class SymmetricMatrix,
+         class InputIterator,
+         class Covariance
+        >
+void build_C(
+	       SymmetricMatrix& A,
+	       int start_row, int start_col,
+	       InputIterator first_i, InputIterator last_i,
+	       InputIterator first_j, InputIterator last_j,
+	       Covariance& covar
+	       ) {
+
+  int i=start_row;
+  for(InputIterator row = first_i ; row != last_i ; row++)
+    {
+      int j=start_col;
+      
+      for(InputIterator col = first_j ; col != last_j ; col++)
+	A(i,j++) = covar( row->location(), col->location());
+      
+      i++;
+    }
+}
 
 
 
