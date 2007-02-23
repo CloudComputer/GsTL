@@ -43,6 +43,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <cstdlib>
+
 
 
 template<
@@ -195,7 +197,17 @@ prob(typename Non_param_cdf::value_type z) const {
   gstl_assert_2( is_valid_cdf( *this ) );
 
   // use STL lower_bound algo to find where in the z-range, z should be placed
-  const_z_iterator pos = std::lower_bound(z_values_.begin(),z_values_.end(),z);
+  //const_z_iterator pos = std::lower_bound(z_values_.begin(),z_values_.end(),z);
+  const_z_iterator pos_first = std::lower_bound(z_values_.begin(),z_values_.end(),z);
+  const_z_iterator pos_last = std::upper_bound(z_values_.begin(),z_values_.end(),z);
+
+  const_z_iterator pos;
+  if( ( pos_last - pos_first ) <= 1 ) pos = pos_first;
+  else {
+    int n_ties = pos_last - pos_first;
+    pos = z_values_.begin() + std::distance(z_values_.begin(), pos_first) +  n_ties*std::rand()/RAND_MAX;
+  }
+
 
   // z <= z1: use lower tail interpolator
   if(pos == z_values_.begin()) {
