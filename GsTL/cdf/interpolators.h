@@ -149,6 +149,20 @@ private:
 };
 
 
+/** No tail "interpolation" (extrapolation actually)
+ *  Simply return the last and first z and p values.
+*/
+class No_TI  : public Tail_interpolator_impl {
+public :
+  No_TI( ) {}
+  virtual Tail_interpolator_impl* clone() const { return new No_TI( );}
+  virtual double z( double z1, double p1, double p ) const {
+    return z1;
+  }
+  virtual double p( double z1, double p1, double z ) const {
+    return p1;
+  }
+};
 
 
 /** Hyperbolic upper-tail "interpolation" (extrapolation actually)
