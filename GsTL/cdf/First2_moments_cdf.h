@@ -51,6 +51,9 @@ public :
 	~First2_moments_cdf(){}
 	virtual int set_moments(float mean, float var ) {return 0;}
 
+  float mean() {return mean_;}
+  const float mean() const {return mean_;}
+
   float variance() {return var_;}
   const float variance() const {return var_;}
 
@@ -64,12 +67,13 @@ protected :
 };
 
 
+
+
 /* ----------------------------------------
   Log Normal cdf, it simply a wrapper over Gaussian_cdf with
   the appropraite transformation from the normal space to the
   lognormal space
 */
-
 class LogNormal_cdf : public First2_moments_cdf {
 
  public:
@@ -288,5 +292,161 @@ template< class Global_cdf >
 inline double Soares_cdf<Global_cdf>::prob(value_type z) const {
 	return 0.0;
 }
+
+/* ----------------------------------------
+  Deutsch cdf, Build a look-up table of ccdf from a sampling of the global 
+  distribution centered on mean with variance spread.
+*/
+
+template< 
+  typename Global_cdf,
+  typename Sampling_cdf = Gaussian_cdf >
+class Deutsch_cdf : public First2_moments_cdf {
+
+ public:
+
+  typedef GsTL::continuous_variable_tag   variable_category;
+  
+
+  Deutsch_cdf( Global_cdf* global_cdf, int inc_mean = 10, int inc_var = 10,int inc_q = 1000,  
+        Sampling_cdf* sampling_cdf = NULL ) : global_cdf_(global_cdf) 
+  {
+      if(!sampling_cdf ) sampling_cdf = new Gaussian_cdf(0.0,1.0);
+
+    mean_global_ = global_cdf->mean();
+    var_global_ = global_cdf->variance();
+
+    Sampling_cdf sampling_cdf1(*sampling_cdf);
+
+    global_min_ = global_cdf->inverse(0.);
+    global_max_ = global_cdf->inverse(1.);
+
+    Tail_interpolator lti = Tail_interpolator( new Power_LTI(global_cdf->inverse(0)) );
+    Linear_interpol mi = Linear_interpol();
+    Tail_interpolator uti = Tail_interpolator( new Power_UTI(global_cdf->inverse(1)) );
+    
+    std::vector<float> p_values;
+    for(float q=0.001; q<=0.999; q += 0.998/inc_q ) p_values.push_back( q );
+    std::vector<float> q_values(p_values.size());
+
+    float min_mean = sampling_cdf->inverse(0.01);
+    float max_mean = sampling_cdf->inverse(0.99);
+    float min_var = 0.;
+    float max_var = 1.5*sampling_cdf->variance();
+
+    for( float m=min_mean; m<= max_mean; m +=( max_mean-min_mean )/ inc_mean ) {
+      for( float v=min_var; v<= max_var; v +=( max_var-min_var )/ inc_var ) {
+         sampling_cdf1.set_moments(m,v);
+         std::vector<float>::iterator it_p = p_values.begin();
+         std::vector<float>::iterator it_q = q_values.begin();
+         for( ; it_p != p_values.end(); ++it_p, ++it_q ) {
+          float inv_sampler = sampling_cdf1.inverse( *it_p );
+          float p_global = sampling_cdf->prob(sampling_cdf1.inverse(*it_p));
+          float val = global_cdf_->inverse(sampling_cdf->prob(sampling_cdf1.inverse(*it_p)));
+          *it_q =  val ;
+        }
+//        Tail_interpolator lti = Tail_interpolator( new Power_LTI(q_values.front()) );
+//        Linear_interpol mi = Linear_interpol();
+//        Tail_interpolator uti = Tail_interpolator( new Power_UTI(q_values.back()) );
+
+
+        Non_param_cdf<>* sampled_cdf = 
+          new Non_param_cdf<>(q_values.begin(),q_values.end(),p_values.begin(),lti,mi,uti );
+        sampled_cdf->make_valid();
+        Moments moments(sampled_cdf->mean(),sampled_cdf->variance());
+        ccdfs_.push_back( std::pair<Moments,Non_param_cdf<>*>(moments, sampled_cdf  ) );
+      }
+    }
+  }
+	  
+  virtual ~Deutsch_cdf(){
+//    ccdfs_vectorT::iterator it = ccdfs_.begin();
+//    for( ; it =! ccdfs_.end(); ++it) delete it->second;
+  }
+
+  float mean() {return mean_;}
+  const float mean() const {return mean_;}
+
+  int set_moments(float mean, float var );
+
+  float variance() {return var_;}
+  const float variance() const {return var_;}
+
+  virtual value_type inverse(double p) const;
+
+  virtual double prob(value_type z) const;
+
+  protected:
+    typedef std::pair<float,float> Moments;
+    typedef std::vector< std::pair<Moments,Non_param_cdf<>*> > ccdfs_vectorT;
+    ccdfs_vectorT ccdfs_;
+	  float var_global_;
+	  float mean_global_;
+	  Global_cdf* global_cdf_;
+    Non_param_cdf<>* ccdf_;
+    value_type global_min_;
+    value_type global_max_;
+    std::pair<Moments,Non_param_cdf<>*> moments_ccdf_;
+  
+};
+
+
+template< typename Global_cdf, typename Sampling_cdf >
+  inline int Deutsch_cdf<Global_cdf,Sampling_cdf>::set_moments(float mean, float var )
+  {
+	  if(mean < global_cdf_->inverse(0.0) ) 
+		  mean_ = global_cdf_->inverse(MIN_PROB) ;
+	  else if (mean > global_cdf_->inverse(1.0) ) 
+		  mean_ = global_cdf_->inverse(MAX_PROB) ;
+	  else 
+		  mean_ = mean;
+	  var_ = var;
+
+    Search_closest_ccdf search_fctr(mean_, var_);
+    ccdfs_vectorT::iterator it = std::min_element(ccdfs_.begin(), ccdfs_.end(), search_fctr );
+    moments_ccdf_ = *it;
+    ccdf_ = it->second;
+
+    //ccdf_ = (std::min_element(ccdfs_.begin(), ccdfs_.end(), search_fctr ) )->second;
+
+	  return 0;
+  }
+
+template< typename Global_cdf, typename Sampling_cdf >
+First2_moments_cdf::value_type Deutsch_cdf<Global_cdf,Sampling_cdf>::inverse(double p) const {
+  //value_type val = ccdf_->inverse( p );
+  value_type val = moments_ccdf_.second->inverse( p );
+  value_type val_cor = (val - moments_ccdf_.first.first )*std::sqrt(var_/moments_ccdf_.first.second) + mean_;
+  //value_type val_cor = (val - ccdf_->mean())*std::sqrt(var_/ccdf_->variance()) + mean_;
+  if( val_cor  < global_min_ ) return global_min_;
+  if( val_cor  > global_max_ ) return global_max_;
+  return val_cor;
+}
+
+template< typename Global_cdf, typename Sampling_cdf >
+double Deutsch_cdf<Global_cdf,Sampling_cdf>::prob(value_type z) const {
+  return ccdf_->prob( z );
+}
+
+
+
+class Search_closest_ccdf {
+public :
+  Search_closest_ccdf(float mean ,float var): mean_(mean),var_(var){}
+  ~Search_closest_ccdf( ){}
+
+  template<typename MomentsCdf>
+  bool operator()(MomentsCdf moments1,MomentsCdf moments2) {
+    float val1 = std::pow((mean_ - moments1.first.first),2) + std::pow((var_ - moments1.first.second),2);
+    float val2 = std::pow((mean_ - moments2.first.first),2) + std::pow((var_ - moments2.first.second),2);
+    return val1 < val2;
+  }
+protected :
+  float mean_;
+  float var_;
+};
+
+
+
 
 #endif
