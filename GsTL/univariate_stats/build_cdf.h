@@ -199,7 +199,6 @@ build_cdf(RandomIterator first, RandomIterator last,
 
 
 
-
 //===================================================================
 
 
@@ -261,6 +260,43 @@ build_cdf_copy( InputIterator first, InputIterator last,
   build_cdf( range_copy.begin(), range_copy.end(), 
 	     z_begin, z_end, p_begin);
 }
+
+
+
+
+
+/** Build a cdf with tie breaking from range [first,last) of values, ie gives P( Z <= z0 ) 
+ * for a given z0.
+ * Notice the "lesser or equal to". It implies that P(Z<=z0) where z0 is the
+ * smallest element of the range is NOT 0. P(Z<=z_n) where z_n is the largest
+ * element of the range IS 1.
+ * Range [first,last) is modified by this function call (it is sorted).
+ * Version 1 of the algorithm will use a cdf discretization of size equal to
+ * the size of range [first,last).
+ */
+
+template<class NonParamCdf, class RandomIterator>
+void
+build_cdf_tie_break(RandomIterator first, RandomIterator last,
+	  NonParamCdf& new_cdf, bool includes_max = false )
+{
+  int nb_of_values = last - first;
+  int nb_of_thresholds = nb_of_values;
+  std::sort(first, last);
+
+  new_cdf.resize(nb_of_thresholds);
+
+  typename NonParamCdf::z_iterator z_it = new_cdf.z_begin();
+  typename NonParamCdf::p_iterator p_it = new_cdf.p_begin();
+
+  if( !includes_max ) nb_of_values++;
+  for(RandomIterator it = first ; it != last; ++it,++z_it, ++p_it ) {
+    *p_it = (double)(std::distance(first,it)+1)/(double)nb_of_values;
+    *z_it = *it;
+  }
+ 
+}
+
 
 
 
