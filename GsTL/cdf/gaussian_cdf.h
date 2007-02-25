@@ -40,7 +40,6 @@
 #include <cmath>
 
 
-
 class Gaussian_cdf : public Cdf<float> {
 
  public:
@@ -57,6 +56,13 @@ class Gaussian_cdf : public Cdf<float> {
 
   float& variance() {return var_;}
   const float& variance() const {return var_;}
+
+  int set_moments(float mean, float var ) {
+    if( var < 0 ) return 1;
+    mean_ = mean;
+    var_ = var;
+    return 0;
+  }
 
   // Added Oct 2005.  Set up the mean and the variance
  // void mean( value_type mean ) { mean_ = mean;}
