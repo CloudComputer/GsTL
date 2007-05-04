@@ -37,6 +37,7 @@
 #include <GsTL/cdf/gaussian_cdf.h>
 #include <GsTL/math/math_functions.h>
 #include <GsTL/utils/gstl_error_messages.h>
+#include <GsTL/cdf/non_param_cdf.h>
 
 
 #include <cmath>
