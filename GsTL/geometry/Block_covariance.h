@@ -12,6 +12,7 @@ class Block_covariance : public Covariance<Location>{
  public:
   typedef Location first_argument_type;
   typedef Location second_argument_type;
+  typedef typename Location::difference_type EuclideanVector;
   typedef typename Covariance_base<Location>::result_type result_type;
 
  public:
@@ -108,4 +109,4 @@ private:
 */
 
 
-#endif;
+#endif

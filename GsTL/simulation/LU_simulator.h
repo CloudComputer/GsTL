@@ -1,12 +1,12 @@
 #ifndef __LU_SIMULATOR__
 #define __LU_SIMULATOR__
 
-#include <GsTL\matrix_library\tnt\cmat.h>
-#include <GsTL\matrix_library\tnt\cholesky.h>
-#include <GsTL\matrix_library\tnt\trisolve.h>
-#include <GsTL\matrix_library\tnt\gstl_gauss_solver.h>
-#include <GsTL\kriging\helper_functions.h>
-#include <GsTL\matrix_library\tnt\lu.h>
+#include <GsTL/matrix_library/tnt/cmat.h>
+#include <GsTL/matrix_library/tnt/cholesky.h>
+#include <GsTL/matrix_library/tnt/trisolve.h>
+#include <GsTL/matrix_library/tnt/gstl_gauss_solver.h>
+#include <GsTL/kriging/helper_functions.h>
+#include <GsTL/matrix_library/tnt/lu.h>
 
 #include <iostream>
 
@@ -26,12 +26,12 @@ public :
   template<
     typename GvalIterator
   >
-  initialize_matrix(GvalIterator unk_begin, GvalIterator unk_end,
+  void initialize_matrix(GvalIterator unk_begin, GvalIterator unk_end,
        GvalIterator data_begin , GvalIterator data_end)    
   {
     size_u_ = std::distance(unk_begin,unk_end);
     size_d_ = std::distance(data_begin,data_end);
-    if(size_u_ == 0 ) return 1;
+    if(size_u_ == 0 ) return ;
     TNT::Matrix< float > C(size_u_+size_d_,size_u_+size_d_);
     w_.resize(size_u_+size_d_);
     L_.resize(size_u_+size_d_,size_u_+size_d_);

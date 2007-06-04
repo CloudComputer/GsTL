@@ -31,9 +31,7 @@
 
 #ifndef __GTL_BUILD_CDF__
 #define __GTL_BUILD_CDF__
-#ifdef __GNUC__
-#pragma interface
-#endif
+
 
 #include <GsTL/cdf/cdf_basics.h>
 #include <GsTL/math/math_functions.h>
@@ -357,14 +355,6 @@ void pdf_to_cdf( NonParamCdf& cdf, const NonParamPdf& pdf,
 //=====================================================================
 
 
-/** Check whether a cdf is valid or not.
- */
-template <class NonParametricCdf>
-bool is_valid_cdf( const NonParametricCdf& cdf ) {
-  return is_valid_cdf( cdf.p_begin(), cdf.p_end(), 
-		       typename NonParametricCdf::variable_category() );
-}
-
 
 
 /** Check whether range [begin,end) defines a valid cdf. This function
@@ -400,30 +390,19 @@ bool is_valid_cdf( ForwardIterator begin, ForwardIterator end,
 		   GsTL::discrete_variable_tag ) {
 
   return is_valid_pdf( begin, end );
-/*
-  double sum = std::accumulate( begin, end, 0.0 );
-  if( !GsTL::equals( sum, 1.0 ) )
-    return false;
-
-  
-  for( ; begin != end; ++begin ) 
-    if( *begin < 0 || *begin > 1 ) return false;
-
-  return true;
-*/
 }
 
 
 
 
-/** Turn a cdf into a valid cdf.
- */ 
-
+/** Check whether a cdf is valid or not.
+ */
 template <class NonParametricCdf>
-bool make_cdf_valid( NonParametricCdf& cdf ) {
-  return make_cdf_valid( cdf.p_begin(), cdf.p_end(), 
-			 typename NonParametricCdf::variable_category() );
+bool is_valid_cdf( const NonParametricCdf& cdf ) {
+  return is_valid_cdf( cdf.p_begin(), cdf.p_end(),
+  		       typename NonParametricCdf::variable_category() );
 }
+
 
 
 
@@ -475,25 +454,19 @@ bool make_cdf_valid( RandomIterator begin, RandomIterator end,
 		     GsTL::discrete_variable_tag tag ) {
 
  return make_pdf_valid( begin, end );        
- /*  
-  if( is_valid_cdf( begin, end, tag ) ) {
-    // no corrections needed
-    return true;
-  }
-
-  // Make all values > 0 and standardize so that they sum-up to 1.
-  for( RandomIterator it = begin; it != end; ++it ) 
-    *it = std::max( *it, 0.0 );
-
-  double sum = std::accumulate( begin, end, 0.0 );
-  if( sum == 0 ) return false;
-
-  for( RandomIterator it2 = begin; it2 != end; ++it2 ) 
-    *it2 = *it2 / sum;
-
-  return true;
-  */
 }
+
+
+
+/** Turn a cdf into a valid cdf.
+ */ 
+
+template <class NonParametricCdf>
+bool make_cdf_valid( NonParametricCdf& cdf ) {
+  return make_cdf_valid( cdf.p_begin(), cdf.p_end(), 
+			 typename NonParametricCdf::variable_category() );
+}
+
 
 
 

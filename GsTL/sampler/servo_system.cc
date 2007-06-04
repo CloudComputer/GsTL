@@ -28,6 +28,8 @@
  */
 
 
+#include <GsTLAppli/grid/grid_model/rgrid.h>
+
 #include <GsTL/utils/gstl_error_messages.h>
 
 template < class RandNumberGenerator >

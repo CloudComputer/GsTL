@@ -196,6 +196,27 @@ inline double Uniform_cdf::prob(value_type z) const
 
 
 
+
+
+
+class Search_closest_ccdf {
+public :
+  Search_closest_ccdf(float mean ,float var): mean_(mean),var_(var){}
+  ~Search_closest_ccdf( ){}
+
+  template<typename MomentsCdf>
+  bool operator()(MomentsCdf moments1,MomentsCdf moments2) {
+    float val1 = std::pow((mean_ - moments1.first.first),2) + std::pow((var_ - moments1.first.second),2);
+    float val2 = std::pow((mean_ - moments2.first.first),2) + std::pow((var_ - moments2.first.second),2);
+    return val1 < val2;
+  }
+protected :
+  float mean_;
+  float var_;
+};
+
+
+
 /* ----------------------------------------
   Soares cdf, sampling of the global distribution centered on mean
   with variance spread.
@@ -428,24 +449,6 @@ template< typename Global_cdf, typename Sampling_cdf >
 double Deutsch_cdf<Global_cdf,Sampling_cdf>::prob(value_type z) const {
   return ccdf_->prob( z );
 }
-
-
-
-class Search_closest_ccdf {
-public :
-  Search_closest_ccdf(float mean ,float var): mean_(mean),var_(var){}
-  ~Search_closest_ccdf( ){}
-
-  template<typename MomentsCdf>
-  bool operator()(MomentsCdf moments1,MomentsCdf moments2) {
-    float val1 = std::pow((mean_ - moments1.first.first),2) + std::pow((var_ - moments1.first.second),2);
-    float val2 = std::pow((mean_ - moments2.first.first),2) + std::pow((var_ - moments2.first.second),2);
-    return val1 < val2;
-  }
-protected :
-  float mean_;
-  float var_;
-};
 
 
 
