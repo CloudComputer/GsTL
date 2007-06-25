@@ -12,7 +12,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: const_mod.hpp,v 2.0 2006/05/02 16:05:11 nico97492 Exp $
+ * $Id: const_mod.hpp,v 3.0 2007/06/25 01:19:42 nico97492 Exp $
  *
  * Revision history
  *  2001-02-18  moved to individual header files

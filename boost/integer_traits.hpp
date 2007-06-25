@@ -10,7 +10,7 @@
  * software for any purpose. It is provided "as is" without express or
  * implied warranty.
  *
- * $Id: integer_traits.hpp,v 2.0 2006/05/02 16:03:54 nico97492 Exp $
+ * $Id: integer_traits.hpp,v 3.0 2007/06/25 01:19:33 nico97492 Exp $
  *
  * Idea by Beman Dawes, Ed Brey, Steve Cleary, and Nathan Myers
  */
