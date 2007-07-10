@@ -38,8 +38,8 @@
 
 using namespace std;
 
-class RGrid;
-class GsTLGridProperty;
+//class RGrid;
+//class GsTLGridProperty;
 
 /** A servo system sampler draws realizations from a cdf so that the cdf of all the 
  * values drawn by the servo system is close to a target cdf.
@@ -102,7 +102,10 @@ class Servo_system_sampler {
     /*
      * function to unsign simulated value at some locations
      */
+    template<class GsTLGridProperty>
     void removeSimulatedNode( GsTLGridProperty* prop, vector<int>& grid_path );
+
+    template<class RGrid, class GsTLGridProperty>
     void removeSimulatedNode( RGrid* grid, GsTLGridProperty* prop, vector<int>& grid_path );
 
     // for testing purpose only

@@ -28,7 +28,7 @@
  */
 
 
-#include <GsTLAppli/grid/grid_model/rgrid.h>
+//#include <GsTLAppli/grid/grid_model/rgrid.h>
 
 #include <GsTL/utils/gstl_error_messages.h>
 
@@ -239,6 +239,7 @@ operator()(GeoValue& gval, const CategNonParamCdf2& ccdf) {
 
 
 template < class RandNumberGenerator >
+template<class GsTLGridProperty>
 void Servo_system_sampler< RandNumberGenerator >::
 removeSimulatedNode( GsTLGridProperty* prop, vector<int>& grid_path )
 {
@@ -256,6 +257,7 @@ removeSimulatedNode( GsTLGridProperty* prop, vector<int>& grid_path )
 
 
 template < class RandNumberGenerator >
+template<class RGrid, class GsTLGridProperty>
 void Servo_system_sampler< RandNumberGenerator >::
 removeSimulatedNode( RGrid* grid, GsTLGridProperty* prop, vector<int>& grid_path )
 {
