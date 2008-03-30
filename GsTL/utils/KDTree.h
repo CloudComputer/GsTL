@@ -119,7 +119,7 @@ public:
 	{
 		nodes.resize(init_nodes.size()+1);
 		if(init_nodes.size() > 0)	
-			optimize(1,0,init_nodes.size(),0);
+			optimize(1,0,init_nodes.size()-1,0);
  		NodeVecType v(0);
  		init_nodes.swap(v);
 	}
