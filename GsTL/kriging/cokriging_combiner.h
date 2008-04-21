@@ -141,12 +141,18 @@ class CoSK_combiner : public CoKriging_combiner_impl<InputIterator,InputIterator
     for( ; first_neigh != last_neigh; ++first_neigh, ++attribute ) {
       // Sum all the weights corresponding to a single attribute and multiply
       // the sum by the mean of the attribute
+		
+	  if (attribute >= means_.size())
+		  break;
+		
       InIter end = begin_weights;
       std::advance( end, first_neigh->size() );
       double sum = 
 	std::accumulate( begin_weights, end, 0.0 );
       sum *= means_[attribute];
       mean_contribution += sum;
+
+
 
       std::advance( begin_weights, first_neigh->size() );
     }
