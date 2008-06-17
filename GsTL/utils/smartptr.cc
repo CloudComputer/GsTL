@@ -51,7 +51,7 @@ operator=( const SmartPtr<T, RefManagePolicy>& smart_ptr ) {
   if( raw_ptr_ )
     new_ref(raw_ptr_);
   if( save )
-    delete_ref(raw_ptr_);
+    delete_ref(save);  // changed from "delete_ref(raw_ptr_)", which looked like a bug
 }
 
 
