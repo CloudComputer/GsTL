@@ -1,13 +1,18 @@
 /* boost random/linear_congruential.hpp header file
  *
  * Copyright Jens Maurer 2000-2001
- * Distributed under the Boost Software License, Version 1.0. (See
- * accompanying file LICENSE_1_0.txt or copy at
- * http://www.boost.org/LICENSE_1_0.txt)
+ * Permission to use, copy, modify, sell, and distribute this software
+ * is hereby granted without fee provided that the above copyright notice
+ * appears in all copies and that both that copyright notice and this
+ * permission notice appear in supporting documentation,
+ *
+ * Jens Maurer makes no representations about the suitability of this
+ * software for any purpose. It is provided "as is" without express or
+ * implied warranty.
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: linear_congruential.hpp,v 3.1 2009/07/17 04:44:14 aboucher Exp $
+ * $Id: linear_congruential.hpp,v 3.2 2009/09/02 20:26:33 aboucher Exp $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -23,7 +28,6 @@
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/random/detail/const_mod.hpp>
-#include <boost/detail/workaround.hpp>
 
 namespace boost {
 namespace random {
@@ -83,8 +87,8 @@ public:
     _x = (_modulus ? (value % _modulus) : value);
   }
 
-  result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return c == 0 ? 1 : 0; }
-  result_type max BOOST_PREVENT_MACRO_SUBSTITUTION () const { return modulus-1; }
+  result_type min() const { return c == 0 ? 1 : 0; }
+  result_type max() const { return modulus-1; }
 
   IntType operator()()
   {
@@ -94,81 +98,39 @@ public:
 
   static bool validation(IntType x) { return val == x; }
 
-#ifdef BOOST_NO_OPERATORS_IN_NAMESPACE
-    
-  // Use a member function; Streamable concept not supported.
-  bool operator==(const linear_congruential& rhs) const
-  { return _x == rhs._x; }
-  bool operator!=(const linear_congruential& rhs) const
-  { return !(*this == rhs); }
+#ifndef BOOST_NO_OPERATORS_IN_NAMESPACE
 
-#else 
+#ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
+  template<class CharT, class Traits>
+  friend std::basic_ostream<CharT,Traits>&
+  operator<<(std::basic_ostream<CharT,Traits>& os,
+             const linear_congruential& lcg)
+  { os << lcg._x; return os; }
+
+  template<class CharT, class Traits>
+  friend std::basic_istream<CharT,Traits>&
+  operator>>(std::basic_istream<CharT,Traits>& is, linear_congruential& lcg)
+  { is >> lcg._x; return is; }
+#endif
+
   friend bool operator==(const linear_congruential& x,
                          const linear_congruential& y)
   { return x._x == y._x; }
   friend bool operator!=(const linear_congruential& x,
                          const linear_congruential& y)
   { return !(x == y); }
-    
-#if !defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS) && !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x551))
-  template<class CharT, class Traits>
-  friend std::basic_ostream<CharT,Traits>&
-  operator<<(std::basic_ostream<CharT,Traits>& os,
-             const linear_congruential& lcg)
-  {
-    return os << lcg._x;
-  }
+#else
+  // Use a member function; Streamable concept not supported.
+  bool operator==(const linear_congruential& rhs) const
+  { return _x == rhs._x; }
+  bool operator!=(const linear_congruential& rhs) const
+  { return !(*this == rhs); }
+#endif
 
-  template<class CharT, class Traits>
-  friend std::basic_istream<CharT,Traits>&
-  operator>>(std::basic_istream<CharT,Traits>& is,
-             linear_congruential& lcg)
-  {
-    return is >> lcg._x;
-  }
- 
 private:
-#endif
-#endif
-    
   IntType _modulus;   // work-around for gcc "divide by zero" warning in ctor
   IntType _x;
 };
-
-// probably needs the "no native streams" caveat for STLPort
-#if !defined(__SGI_STL_PORT) && BOOST_WORKAROUND(__GNUC__, == 2)
-template<class IntType, IntType a, IntType c, IntType m, IntType val>
-std::ostream&
-operator<<(std::ostream& os,
-           const linear_congruential<IntType,a,c,m,val>& lcg)
-{
-    return os << lcg._x;
-}
-
-template<class IntType, IntType a, IntType c, IntType m, IntType val>
-std::istream&
-operator>>(std::istream& is,
-           linear_congruential<IntType,a,c,m,val>& lcg)
-{
-    return is >> lcg._x;
-}
-#elif defined(BOOST_NO_OPERATORS_IN_NAMESPACE) || defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS) || BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x551))
-template<class CharT, class Traits, class IntType, IntType a, IntType c, IntType m, IntType val>
-std::basic_ostream<CharT,Traits>&
-operator<<(std::basic_ostream<CharT,Traits>& os,
-           const linear_congruential<IntType,a,c,m,val>& lcg)
-{
-    return os << lcg._x;
-}
-
-template<class CharT, class Traits, class IntType, IntType a, IntType c, IntType m, IntType val>
-std::basic_istream<CharT,Traits>&
-operator>>(std::basic_istream<CharT,Traits>& is,
-           linear_congruential<IntType,a,c,m,val>& lcg)
-{
-    return is >> lcg._x;
-}
-#endif
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 //  A definition is required even for integral static constants
@@ -178,8 +140,6 @@ template<class IntType, IntType a, IntType c, IntType m, IntType val>
 const typename linear_congruential<IntType, a, c, m, val>::result_type linear_congruential<IntType, a, c, m, val>::min_value;
 template<class IntType, IntType a, IntType c, IntType m, IntType val>
 const typename linear_congruential<IntType, a, c, m, val>::result_type linear_congruential<IntType, a, c, m, val>::max_value;
-template<class IntType, IntType a, IntType c, IntType m, IntType val>
-const IntType linear_congruential<IntType,a,c,m,val>::modulus;
 #endif
 
 } // namespace random
@@ -204,18 +164,18 @@ public:
 #else
   enum { has_fixed_range = false };
 #endif
-  int32_t min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return 0; }
-  int32_t max BOOST_PREVENT_MACRO_SUBSTITUTION () const { return std::numeric_limits<int32_t>::max BOOST_PREVENT_MACRO_SUBSTITUTION (); }
+  int32_t min() const { return 0; }
+  int32_t max() const { return std::numeric_limits<int32_t>::max(); }
   
   explicit rand48(int32_t x0 = 1) : lcf(cnv(x0)) { }
   explicit rand48(uint64_t x0) : lcf(x0) { }
   template<class It> rand48(It& first, It last) : lcf(first, last) { }
   // compiler-generated copy ctor and assignment operator are fine
-  void seed(int32_t x0 = 1) { lcf.seed(cnv(x0)); }
+  void seed(int32_t x0) { lcf.seed(cnv(x0)); }
   void seed(uint64_t x0) { lcf.seed(x0); }
   template<class It> void seed(It& first, It last) { lcf.seed(first,last); }
 
-  int32_t operator()() { return static_cast<int32_t>(lcf() >> 17); }
+  int32_t operator()() { return lcf() >> 17; }
   // by experiment from lrand48()
   static bool validation(int32_t x) { return x == 1993516219; }
 

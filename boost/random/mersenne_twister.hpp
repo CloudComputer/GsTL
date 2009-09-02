@@ -1,13 +1,18 @@
 /* boost random/mersenne_twister.hpp header file
  *
  * Copyright Jens Maurer 2000-2001
- * Distributed under the Boost Software License, Version 1.0. (See
- * accompanying file LICENSE_1_0.txt or copy at
- * http://www.boost.org/LICENSE_1_0.txt)
+ * Permission to use, copy, modify, sell, and distribute this software
+ * is hereby granted without fee provided that the above copyright notice
+ * appears in all copies and that both that copyright notice and this
+ * permission notice appear in supporting documentation,
+ *
+ * Jens Maurer makes no representations about the suitability of this
+ * software for any purpose. It is provided "as is" without express or
+ * implied warranty.
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: mersenne_twister.hpp,v 3.1 2009/07/17 04:44:14 aboucher Exp $
+ * $Id: mersenne_twister.hpp,v 3.2 2009/09/02 20:26:33 aboucher Exp $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -25,8 +30,7 @@
 #include <boost/integer_traits.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/random/linear_congruential.hpp>
-#include <boost/detail/workaround.hpp>
-#include <boost/random/detail/ptr_helper.hpp>
+# include <boost/detail/workaround.hpp>
 
 namespace boost {
 namespace random {
@@ -68,7 +72,7 @@ public:
 
   // compiler-generated copy ctor and assignment operator are fine
 
-  void seed() { seed(UIntType(5489)); }
+  void seed() { seed(UIntType(4357)); }
 
 #if defined(__SUNPRO_CC) && (__SUNPRO_CC <= 0x520)
   // Work around overload resolution problem (Gennadiy E. Rozental)
@@ -77,16 +81,9 @@ public:
   void seed(UIntType value)
 #endif
   {
-    // New seeding algorithm from 
-    // http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html
-    // In the previous versions, MSBs of the seed affected only MSBs of the
-    // state x[].
-    const UIntType mask = ~0u;
-    x[0] = value & mask;
-    for (i = 1; i < n; i++) {
-      // See Knuth "The Art of Computer Programming" Vol. 2, 3rd ed., page 106
-      x[i] = (1812433253UL * (x[i-1] ^ (x[i-1] >> (w-2))) + i) & mask;
-    }
+    random::linear_congruential<uint32_t, 69069, 0, 0, /* unknown */ 0> 
+      gen(value);
+    seed(gen);
   }
 
   // For GCC, moving this function out-of-line prevents inlining, which may
@@ -115,13 +112,13 @@ public:
       throw std::invalid_argument("mersenne_twister::seed");
   }
   
-  result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return 0; }
-  result_type max BOOST_PREVENT_MACRO_SUBSTITUTION () const
+  result_type min() const { return 0; }
+  result_type max() const
   {
     // avoid "left shift count >= with of type" warning
     result_type res = 0;
-    for(int j = 0; j < w; ++j)
-      res |= (1u << j);
+    for(int i = 0; i < w; ++i)
+      res |= (1u << i);
     return res;
   }
 
@@ -146,10 +143,11 @@ public:
   {
     for(int j = 0; j < mt.state_size; ++j)
       is >> mt.x[j] >> std::ws;
-    // MSVC (up to 7.1) and Borland (up to 5.64) don't handle the template
-    // value parameter "n" available from the class template scope, so use
-    // the static constant with the same value
+# if BOOST_WORKAROUND(_MSC_FULL_VER, BOOST_TESTED_AT(13102292)) && BOOST_MSVC > 1300
     mt.i = mt.state_size;
+# else 
+    mt.i = n;
+# endif 
     return is;
   }
 #endif
@@ -296,7 +294,5 @@ typedef random::mersenne_twister<uint32_t,32,624,397,31,0x9908b0df,11,
   7,0x9d2c5680,15,0xefc60000,18, 3346425566U> mt19937;
 
 } // namespace boost
-
-BOOST_RANDOM_PTR_HELPER_SPEC(boost::mt19937)
 
 #endif // BOOST_RANDOM_MERSENNE_TWISTER_HPP
