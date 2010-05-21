@@ -10,7 +10,7 @@
 #endif
 
 #include <algorithm>
-#include "Common/ExceptionStandard.h"
+#include "ExceptionStandard.h"
 #include "CGLA.h"
 
 #if defined(_MSC_VER)

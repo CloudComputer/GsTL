@@ -12,7 +12,7 @@
 #endif
 
 #include <algorithm>
-#include "Common/CommonDefs.h"
+#include "CommonDefs.h"
 
 namespace CGLA {
 
