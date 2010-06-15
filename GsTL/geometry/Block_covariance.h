@@ -61,7 +61,7 @@ class Block_covariance : public Covariance<Location>{
           }
 
       EuclideanVector vec_c0(0.,0.,0.);
-   //   c0_ = compute(vec_c0);
+      c0_ = compute(vec_c0);
    }
 
    result_type c0() const { return c0_;}
@@ -79,7 +79,7 @@ class Block_covariance : public Covariance<Location>{
 
   inline  result_type compute(const EuclideanVector& vec) const  {
     result_type cov = 0;
-    std::vector< EuclideanVector >::const_iterator it = block_vectors_.begin();
+    typename std::vector< EuclideanVector >::const_iterator it = block_vectors_.begin();
     for(; it != block_vectors_.end() ; ++it) {
       EuclideanVector eVec(vec[0] + it->x(),vec[1] + it->y(),vec[2] + it->z());
       cov += cov_.compute(eVec);
@@ -90,8 +90,8 @@ class Block_covariance : public Covariance<Location>{
 
 
 protected:
- // Covariance<Location> cov_;
-//  float c0_;
+  Covariance<Location> cov_;
+  float c0_;
   std::vector< EuclideanVector > block_vectors_;
   float n_blkpoints_;
 
