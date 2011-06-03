@@ -82,6 +82,8 @@ sequential_simulation(
     
     DEBUG_PRINT_LOCATION( "center", begin->location() );
 
+    if( !neighbors.is_valid() ) continue;
+
     if( neighbors.is_empty() ){
       //if we don't have any conditioning data, we simply draw from the
       // marginal
@@ -157,6 +159,8 @@ sequential_simulation(
     neighbors.find_neighbors( *begin );
 
     DEBUG_PRINT_LOCATION( "center", begin->location() );
+
+    if( !neighbors.is_valid() ) continue;
 
     if( neighbors.is_empty() ){
       //if we don't have any conditioning data, we simply draw from the
@@ -249,6 +253,8 @@ sequential_simulation_2(
 
     neighbors.find_neighbors( *begin );
 
+    if( !neighbors->is_valid() ) continue;
+
     int status = estim( *begin, *neighbors, ccdf);
 
     if(status == 0)
@@ -297,6 +303,8 @@ sequential_simulation(
     neighbors.find_neighbors( *begin );
     
     DEBUG_PRINT_LOCATION( "center", begin->location() );
+
+    if( !neighbors.is_valid() ) continue;
 
     if( neighbors.is_empty() ){
       //if we don't have any conditioning data, we simply draw from the
@@ -359,6 +367,8 @@ sequential_simulation(
     neighbors.find_neighbors( *begin );
 
     DEBUG_PRINT_LOCATION( "center", begin->location() );
+
+    if( !neighbors.is_valid() ) continue;
 
     if( neighbors.is_empty() ){
       //if we don't have any conditioning data, we simply draw from the

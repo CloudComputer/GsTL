@@ -571,7 +571,7 @@ class Covariance {
   double sill( int id ) const;
   void sill( int id, double s );
   
- protected:
+ private:
   typedef Anisotropic_covariance_3d<Location> StructureType;
   Nested_structures_covariance<Location> cov_;
 
@@ -591,7 +591,42 @@ Basic_model<Location>* create_gaussian_covariance();
 template<class Location>
 Basic_model<Location>* create_exponential_covariance();
 
+//====================
+template<class Location>
+class Zero_covariance : public Covariance<Location>{
+ public:
+  typedef Location first_argument_type;
+  typedef Location second_argument_type;
+  typedef typename Location::difference_type EuclideanVector;
+  typedef typename Covariance_base<Location>::result_type result_type;
 
+ public:
+
+   ~Zero_covariance(){};
+
+
+  Zero_covariance<Location>* clone() const {
+    return new Zero_covariance<Location>();
+  }
+
+   result_type c0() const { return 0.0;}
+
+
+ // virtual result_type isotrop_compute( double h ) const;
+
+  inline result_type operator()(const Location& u1, const Location& u2) const {
+	return 0.;
+  }
+
+  result_type  compute(const Location head, const Location tail) const {
+	  return 0.; }
+
+  result_type compute(const EuclideanVector& vec) const  {
+    return 0.;
+  }
+
+
+};
 
 
 //================================================================

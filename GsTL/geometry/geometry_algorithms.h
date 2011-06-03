@@ -236,8 +236,8 @@ class Anisotropic_norm_3d{
 
 template<class EuclideanVector>
 Anisotropic_norm_3d<EuclideanVector>::
-Anisotropic_norm_3d(double max_radius, double mid_radius, 
-		    double min_radius, 
+Anisotropic_norm_3d(double radius1, double radius2, 
+		    double radius3, 
 		    double alpha, double beta, double theta) {
 
 // The thrid argument of TNT matrix constructor is the initialization value
@@ -249,12 +249,16 @@ Anisotropic_norm_3d(double max_radius, double mid_radius,
   bool equal_zero=false;
   bool too_big = false;
 
-  if( max_radius==0 ) {equal_zero=true; max_radius=0.0001; }
-  if( mid_radius==0 ) {equal_zero=true; mid_radius=0.0001; }
-  if( min_radius==0 ) {equal_zero=true; min_radius=0.0001; }
+  if( radius1==0 ) {equal_zero=true; radius1=0.0001; }
+  if( radius2==0 ) {equal_zero=true; radius2=0.0001; }
+  if( radius3==0 ) {equal_zero=true; radius3=0.0001; }
+
+  double max_radius = std::max( std::max(radius1,radius2), radius3 );
+
+  /*
   if( mid_radius > max_radius ) {too_big=true; mid_radius = max_radius; }
   if( min_radius > mid_radius ) {too_big=true; min_radius = mid_radius; }
-  
+  */
   if( equal_zero ) {
     gstl_warning( "one (or more) of the radii was reset to 0.0001 "
 		  << "because it was equal to zero" );
@@ -265,10 +269,10 @@ Anisotropic_norm_3d(double max_radius, double mid_radius,
   }
  
 
-  gstl_assert( min_radius != 0 && mid_radius != 0 );
-  S(1,1)=1.0;
-  S(2,2)=max_radius/mid_radius;
-  S(3,3)=max_radius/min_radius;
+  gstl_assert( radius1 != 0 && radius2 != 0 && radius3 != 0);
+  S(1,1)=max_radius/radius1;
+  S(2,2)=max_radius/radius2;
+  S(3,3)=max_radius/radius3;
   
   // Rotation about Z-axis
   R1(1,1) =  cos(alpha);
@@ -424,11 +428,11 @@ Anisotropic_transform_3d(double max_radius, double mid_radius,
   if( mid_radius==0 ) {equal_zero=true; mid_radius=0.0001; }
 
   if( min_radius==0 ) {equal_zero=true; min_radius=0.0001; }
-
+/*
   if( mid_radius > max_radius ) {too_big=true; mid_radius = max_radius; }
 
   if( min_radius > mid_radius ) {too_big=true; min_radius = mid_radius; }
-
+*/
   
 
   if( equal_zero ) {
