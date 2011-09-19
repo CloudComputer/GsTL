@@ -571,7 +571,7 @@ class Covariance {
   double sill( int id ) const;
   void sill( int id, double s );
   
- private:
+ protected:
   typedef Anisotropic_covariance_3d<Location> StructureType;
   Nested_structures_covariance<Location> cov_;
 

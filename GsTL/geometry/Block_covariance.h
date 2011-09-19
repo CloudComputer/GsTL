@@ -90,7 +90,7 @@ class Block_covariance : public Covariance<Location>{
 
 
 protected:
-  Covariance<Location> cov_;
+  //Covariance<Location> cov_;
   float c0_;
   std::vector< EuclideanVector > block_vectors_;
   float n_blkpoints_;
