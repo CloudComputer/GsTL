@@ -20,7 +20,8 @@ class Block_covariance : public Covariance<Location>{
    Block_covariance():Covariance_base<Location>() {};
    virtual ~Block_covariance(){};
 
-   Block_covariance(const Block_covariance<Location>& rhs){
+   Block_covariance(const Block_covariance<Location>& rhs) :
+   Covariance<Location>(rhs){
     cov_ = rhs.cov_;
     c0_ = rhs.c0_;
     block_vectors_ = rhs.block_vectors_;
@@ -28,7 +29,7 @@ class Block_covariance : public Covariance<Location>{
 
    Block_covariance(Covariance<Location> cov, float c0,
      std::vector< GsTLVector< float > > blk_vec )
-     :cov_(cov),c0_(c0),block_vectors_(blk_vec) {};
+     :Covariance<Location>(cov),c0_(c0),block_vectors_(blk_vec) {};
 
   Block_covariance<Location>* clone() const {
     return new Block_covariance<Location>(this->cov_, this->c0_,this->block_vectors_);
