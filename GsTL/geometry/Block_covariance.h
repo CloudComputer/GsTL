@@ -22,7 +22,6 @@ class Block_covariance : public Covariance<Location>{
 
    Block_covariance(const Block_covariance<Location>& rhs) :
    Covariance<Location>(rhs){
-    cov_ = rhs.cov_;
     c0_ = rhs.c0_;
     block_vectors_ = rhs.block_vectors_;
    }
@@ -31,8 +30,13 @@ class Block_covariance : public Covariance<Location>{
      std::vector< GsTLVector< float > > blk_vec )
      :Covariance<Location>(cov),c0_(c0),block_vectors_(blk_vec) {};
 
+/*
   Block_covariance<Location>* clone() const {
     return new Block_covariance<Location>(this->cov_, this->c0_,this->block_vectors_);
+  }
+*/
+  Block_covariance<Location>* clone() const {
+    return new Block_covariance<Location>(this);
   }
 
    Block_covariance(Covariance<Location>& cov, GsTLVector<int> block_pts, EuclideanVector cell_dim )
@@ -83,7 +87,8 @@ class Block_covariance : public Covariance<Location>{
     typename std::vector< EuclideanVector >::const_iterator it = block_vectors_.begin();
     for(; it != block_vectors_.end() ; ++it) {
       EuclideanVector eVec(vec[0] + it->x(),vec[1] + it->y(),vec[2] + it->z());
-      cov += cov_.compute(eVec);
+      cov += Covariance<Location>::compute(eVec);
+//      cov += cov_.compute(eVec);
   
      }
     return cov/n_blkpoints_;
