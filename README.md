@@ -5,7 +5,7 @@ This git repository is a copy of the cvs repository obtained from [SourceForge](
 To install:
 ```bash
 cd <desired repository base directory>
-git clone <GsTL>
+git clone https://github.com/gerwathome/GsTL
 cd GsTL
 sudo make install
 ```
